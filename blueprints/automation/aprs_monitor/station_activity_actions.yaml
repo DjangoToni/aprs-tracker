@@ -1,0 +1,66 @@
+blueprint:
+  name: APRS Monitor - Stationsereignisse
+  description: >-
+    Führt frei wählbare Aktionen aus, wenn eine APRS-Station ein ausgewähltes
+    Bewegungs-, Radius- oder Positionsereignis meldet.
+  domain: automation
+  homeassistant:
+    min_version: 2026.7.0
+  input:
+    activity_entity:
+      name: Stationsaktivität
+      description: Ereignisentität des gewünschten APRS-Rufzeichens.
+      selector:
+        entity:
+          filter:
+            - domain: event
+              integration: aprs_monitor
+    event_types:
+      name: Auslösende Ereignisse
+      default:
+        - movement_started
+        - entered_home_radius
+        - position_stale
+        - position_lost
+      selector:
+        select:
+          multiple: true
+          options:
+            - label: Bewegung begonnen
+              value: movement_started
+            - label: Bewegung beendet
+              value: movement_stopped
+            - label: Zuhause-Radius betreten
+              value: entered_home_radius
+            - label: Zuhause-Radius verlassen
+              value: left_home_radius
+            - label: Position aktuell
+              value: position_current
+            - label: Position veraltet
+              value: position_stale
+            - label: Position verloren
+              value: position_lost
+    actions:
+      name: Aktionen
+      description: Benachrichtigungen oder andere Home-Assistant-Aktionen.
+      selector:
+        action: {}
+
+variables:
+  selected_event_types: !input event_types
+
+trigger:
+  - platform: state
+    entity_id: !input activity_entity
+    attribute: event_type
+
+condition:
+  - condition: template
+    value_template: >-
+      {{ trigger.to_state is not none and
+         trigger.to_state.attributes.get('event_type') in selected_event_types }}
+
+action: !input actions
+
+mode: queued
+max: 10

@@ -1,0 +1,185 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "APRS Monitor is already configured.",
+      "reauth_successful": "The aprs.fi API key was updated successfully."
+    },
+    "error": {
+      "api_key_required": "Enter an aprs.fi API key.",
+      "cannot_connect": "Could not connect to aprs.fi. Try again later.",
+      "invalid_auth": "The aprs.fi API key was rejected.",
+      "invalid_callsigns": "Enter 1 to 20 exact callsigns separated by commas. Wildcards are not supported."
+    },
+    "step": {
+      "user": {
+        "data": {
+          "api_key": "aprs.fi API key",
+          "callsigns": "Callsigns"
+        },
+        "description": "Enter your personal aprs.fi API key and 1 to 20 exact callsigns.",
+        "title": "Set up APRS Monitor"
+      },
+      "reauth_confirm": {
+        "data": {
+          "api_key": "New aprs.fi API key"
+        },
+        "description": "The stored aprs.fi API key was rejected. Enter a valid replacement key.",
+        "title": "Reconnect APRS Monitor"
+      }
+    }
+  },
+  "options": {
+    "error": {
+      "invalid_callsigns": "Enter 1 to 20 exact callsigns separated by commas. Wildcards are not supported.",
+      "invalid_home_radius": "Enter a home radius between 1 and 1000 kilometers.",
+      "invalid_max_position_age": "Enter a maximum position age between 15 and 1440 minutes.",
+      "invalid_movement_speed_threshold": "Enter a movement threshold between 0.5 and 50 kilometers per hour.",
+      "invalid_update_interval": "Enter an update interval between 5 and 60 minutes."
+    },
+    "step": {
+      "init": {
+        "data": {
+          "callsigns": "Callsigns",
+          "home_radius": "Near-home radius (km)",
+          "max_position_age": "Mark position stale after (minutes)",
+          "movement_speed_threshold": "Movement threshold (km/h)",
+          "update_interval": "Update interval (minutes)"
+        },
+        "description": "Choose stations and global defaults. Individual station profiles follow in the next step.",
+        "title": "Configure APRS Monitor"
+      },
+      "profiles": {
+        "data": {
+          "display_name": "Display name",
+          "home_radius": "Near-home radius (km)",
+          "max_position_age": "Mark position stale after (minutes)",
+          "movement_speed_threshold": "Movement threshold (km/h)"
+        },
+        "description": "Expand each callsign to configure its name and individual thresholds.",
+        "title": "Station profiles"
+      }
+    }
+  },
+  "system_health": {
+    "info": {
+      "can_reach_aprs_fi": "Reach aprs.fi API",
+      "configured_entries": "Configured entries",
+      "configured_station_count": "Configured stations",
+      "home_radius_km": "Near-home radius (km)",
+      "last_successful_update": "Last successful update",
+      "last_update_success": "Last update successful",
+      "loaded_entries": "Loaded entries",
+      "max_position_age_minutes": "Maximum position age (minutes)",
+      "movement_speed_threshold_kmh": "Movement threshold (km/h)",
+      "update_interval_minutes": "Update interval (minutes)"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "api_connected": {
+        "name": "API connected"
+      },
+      "near_home": {
+        "name": "Near home"
+      },
+      "moving": {
+        "name": "Moving"
+      },
+      "position_current": {
+        "name": "Position current"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Update now"
+      }
+    },
+    "event": {
+      "connection_activity": {
+        "name": "Connection activity",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "api_recovered": "API recovered",
+              "api_unavailable": "API unavailable"
+            }
+          }
+        }
+      },
+      "station_activity": {
+        "name": "Station activity",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "entered_home_radius": "Entered home radius",
+              "left_home_radius": "Left home radius",
+              "movement_started": "Movement started",
+              "movement_stopped": "Movement stopped",
+              "position_current": "Position current",
+              "position_lost": "Position lost",
+              "position_stale": "Position stale"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "altitude": {
+        "name": "Altitude"
+      },
+      "aprs_symbol": {
+        "name": "APRS symbol"
+      },
+      "bearing_from_home": {
+        "name": "Bearing from home"
+      },
+      "course": {
+        "name": "Course"
+      },
+      "course_direction": {
+        "name": "Course direction",
+        "state": {
+          "east": "East",
+          "north": "North",
+          "northeast": "Northeast",
+          "northwest": "Northwest",
+          "south": "South",
+          "southeast": "Southeast",
+          "southwest": "Southwest",
+          "west": "West"
+        }
+      },
+      "distance_from_home": {
+        "name": "Distance from home"
+      },
+      "last_seen": {
+        "name": "Last seen"
+      },
+      "last_successful_update": {
+        "name": "Last successful update"
+      },
+      "overall_status": {
+        "name": "Overall status",
+        "state": {
+          "degraded": "Degraded",
+          "error": "Error",
+          "ok": "OK"
+        }
+      },
+      "position_age": {
+        "name": "Position age"
+      },
+      "speed": {
+        "name": "Speed"
+      },
+      "station_status": {
+        "name": "Station status",
+        "state": {
+          "current": "Current",
+          "no_position": "No position",
+          "stale": "Stale"
+        }
+      }
+    }
+  }
+}

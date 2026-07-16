@@ -1,0 +1,34 @@
+title: APRS Monitor
+views:
+  - title: Übersicht
+    path: aprs-monitor
+    icon: mdi:radio-tower
+    cards:
+      - type: map
+        title: APRS-Stationen
+        hours_to_show: 24
+        auto_fit: true
+        entities:
+          - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
+          - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
+          - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
+      - type: entities
+        title: Kontrollzentrum
+        show_header_toggle: false
+        entities:
+          - binary_sensor.REPLACE_WITH_API_CONNECTED
+          - sensor.REPLACE_WITH_OVERALL_STATUS
+          - sensor.REPLACE_WITH_LAST_SUCCESSFUL_UPDATE
+          - button.REPLACE_WITH_REFRESH
+      - type: entities
+        title: Station 1
+        show_header_toggle: false
+        entities:
+          - sensor.REPLACE_WITH_STATION_STATUS
+          - sensor.REPLACE_WITH_SPEED
+          - sensor.REPLACE_WITH_ALTITUDE
+          - sensor.REPLACE_WITH_COURSE_DIRECTION
+          - sensor.REPLACE_WITH_DISTANCE_FROM_HOME
+          - sensor.REPLACE_WITH_POSITION_AGE
+          - binary_sensor.REPLACE_WITH_MOVING
+          - binary_sensor.REPLACE_WITH_NEAR_HOME

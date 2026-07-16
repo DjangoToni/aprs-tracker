@@ -1,0 +1,47 @@
+blueprint:
+  name: APRS Monitor - API-Verbindung
+  description: >-
+    Führt unterschiedliche Aktionen beim Ausfall und bei der Wiederherstellung
+    der aprs.fi-Verbindung aus.
+  domain: automation
+  homeassistant:
+    min_version: 2026.7.0
+  input:
+    connection_event:
+      name: Verbindungsaktivität
+      description: Ereignisentität des zentralen APRS-Monitor-Geräts.
+      selector:
+        entity:
+          filter:
+            - domain: event
+              integration: aprs_monitor
+    unavailable_actions:
+      name: Aktionen bei API-Ausfall
+      selector:
+        action: {}
+    recovered_actions:
+      name: Aktionen nach Wiederherstellung
+      selector:
+        action: {}
+
+trigger:
+  - platform: state
+    entity_id: !input connection_event
+    attribute: event_type
+    to: api_unavailable
+    id: unavailable
+  - platform: state
+    entity_id: !input connection_event
+    attribute: event_type
+    to: api_recovered
+    id: recovered
+
+action:
+  - choose:
+      - conditions: "{{ trigger.id == 'unavailable' }}"
+        sequence: !input unavailable_actions
+      - conditions: "{{ trigger.id == 'recovered' }}"
+        sequence: !input recovered_actions
+
+mode: queued
+max: 10
