@@ -1,0 +1,60 @@
+name: Fehlerbericht
+description: Einen reproduzierbaren Fehler in APRS Monitor melden
+title: "[Fehler]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Entferne API-Keys, Rufzeichen, Koordinaten, Kommentare und persönliche
+        Positionsdaten aus allen eingefügten Informationen.
+  - type: input
+    id: version
+    attributes:
+      label: APRS-Monitor-Version
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: home_assistant
+    attributes:
+      label: Home-Assistant-Version
+      placeholder: 2026.7.2
+    validations:
+      required: true
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation
+      options:
+        - HACS
+        - Manuelles Direct-Folder-Paket
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Fehlerbeschreibung
+      description: Was ist passiert und was wurde erwartet?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Schritte zur Reproduktion
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Bereinigte Protokolle oder Diagnosen
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Datenschutz
+      options:
+        - label: Ich habe Zugangsdaten und persönliche APRS-Daten entfernt.
+          required: true

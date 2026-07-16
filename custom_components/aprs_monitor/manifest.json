@@ -1,0 +1,13 @@
+{
+  "codeowners": ["@DjangoToni"],
+  "config_flow": true,
+  "documentation": "https://github.com/DjangoToni/aprs-tracker",
+  "domain": "aprs_monitor",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/DjangoToni/aprs-tracker/issues",
+  "name": "APRS Monitor",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "1.0.0"
+}

@@ -1,0 +1,185 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "APRS Monitor ist bereits eingerichtet.",
+      "reauth_successful": "Der aprs.fi-API-Key wurde erfolgreich aktualisiert."
+    },
+    "error": {
+      "api_key_required": "Gib einen aprs.fi-API-Key ein.",
+      "cannot_connect": "Die Verbindung zu aprs.fi ist fehlgeschlagen. Versuche es später erneut.",
+      "invalid_auth": "Der aprs.fi-API-Key wurde abgelehnt.",
+      "invalid_callsigns": "Gib 1 bis 20 konkrete, durch Kommas getrennte Rufzeichen ein. Platzhalter werden nicht unterstützt."
+    },
+    "step": {
+      "user": {
+        "data": {
+          "api_key": "aprs.fi-API-Key",
+          "callsigns": "Rufzeichen"
+        },
+        "description": "Gib deinen persönlichen aprs.fi-API-Key und 1 bis 20 konkrete Rufzeichen ein.",
+        "title": "APRS Monitor einrichten"
+      },
+      "reauth_confirm": {
+        "data": {
+          "api_key": "Neuer aprs.fi-API-Key"
+        },
+        "description": "Der gespeicherte aprs.fi-API-Key wurde abgelehnt. Gib einen gültigen Ersatz-Key ein.",
+        "title": "APRS Monitor erneut verbinden"
+      }
+    }
+  },
+  "options": {
+    "error": {
+      "invalid_callsigns": "Gib 1 bis 20 konkrete, durch Kommas getrennte Rufzeichen ein. Platzhalter werden nicht unterstützt.",
+      "invalid_home_radius": "Gib einen Zuhause-Radius zwischen 1 und 1000 Kilometern ein.",
+      "invalid_max_position_age": "Gib ein maximales Positionsalter zwischen 15 und 1440 Minuten ein.",
+      "invalid_movement_speed_threshold": "Gib eine Bewegungsschwelle zwischen 0,5 und 50 Kilometern pro Stunde ein.",
+      "invalid_update_interval": "Gib ein Aktualisierungsintervall zwischen 5 und 60 Minuten ein."
+    },
+    "step": {
+      "init": {
+        "data": {
+          "callsigns": "Rufzeichen",
+          "home_radius": "Nähe-Radius Zuhause (km)",
+          "max_position_age": "Position veraltet nach (Minuten)",
+          "movement_speed_threshold": "Bewegungsschwelle (km/h)",
+          "update_interval": "Aktualisierungsintervall (Minuten)"
+        },
+        "description": "Wähle Stationen und globale Vorgaben. Im nächsten Schritt folgen die einzelnen Stationsprofile.",
+        "title": "APRS Monitor konfigurieren"
+      },
+      "profiles": {
+        "data": {
+          "display_name": "Anzeigename",
+          "home_radius": "Nähe-Radius Zuhause (km)",
+          "max_position_age": "Position veraltet nach (Minuten)",
+          "movement_speed_threshold": "Bewegungsschwelle (km/h)"
+        },
+        "description": "Klappe jedes Rufzeichen auf, um Name und individuelle Grenzwerte festzulegen.",
+        "title": "Stationsprofile"
+      }
+    }
+  },
+  "system_health": {
+    "info": {
+      "can_reach_aprs_fi": "aprs.fi-API erreichbar",
+      "configured_entries": "Konfigurierte Einträge",
+      "configured_station_count": "Konfigurierte Stationen",
+      "home_radius_km": "Nähe-Radius Zuhause (km)",
+      "last_successful_update": "Letzter erfolgreicher Abruf",
+      "last_update_success": "Letzter Abruf erfolgreich",
+      "loaded_entries": "Geladene Einträge",
+      "max_position_age_minutes": "Maximales Positionsalter (Minuten)",
+      "movement_speed_threshold_kmh": "Bewegungsschwelle (km/h)",
+      "update_interval_minutes": "Aktualisierungsintervall (Minuten)"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "api_connected": {
+        "name": "API verbunden"
+      },
+      "near_home": {
+        "name": "In der Nähe"
+      },
+      "moving": {
+        "name": "In Bewegung"
+      },
+      "position_current": {
+        "name": "Position aktuell"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Jetzt aktualisieren"
+      }
+    },
+    "event": {
+      "connection_activity": {
+        "name": "Verbindungsaktivität",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "api_recovered": "API wieder erreichbar",
+              "api_unavailable": "API nicht erreichbar"
+            }
+          }
+        }
+      },
+      "station_activity": {
+        "name": "Stationsaktivität",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "entered_home_radius": "Zuhause-Radius betreten",
+              "left_home_radius": "Zuhause-Radius verlassen",
+              "movement_started": "Bewegung begonnen",
+              "movement_stopped": "Bewegung beendet",
+              "position_current": "Position aktuell",
+              "position_lost": "Position verloren",
+              "position_stale": "Position veraltet"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "altitude": {
+        "name": "Höhe"
+      },
+      "aprs_symbol": {
+        "name": "APRS-Symbol"
+      },
+      "bearing_from_home": {
+        "name": "Peilung von Zuhause"
+      },
+      "course": {
+        "name": "Kurs"
+      },
+      "course_direction": {
+        "name": "Kursrichtung",
+        "state": {
+          "east": "Ost",
+          "north": "Nord",
+          "northeast": "Nordost",
+          "northwest": "Nordwest",
+          "south": "Süd",
+          "southeast": "Südost",
+          "southwest": "Südwest",
+          "west": "West"
+        }
+      },
+      "distance_from_home": {
+        "name": "Entfernung von Zuhause"
+      },
+      "last_seen": {
+        "name": "Zuletzt empfangen"
+      },
+      "last_successful_update": {
+        "name": "Letzter erfolgreicher Abruf"
+      },
+      "overall_status": {
+        "name": "Gesamtstatus",
+        "state": {
+          "degraded": "Eingeschränkt",
+          "error": "Fehler",
+          "ok": "OK"
+        }
+      },
+      "position_age": {
+        "name": "Positionsalter"
+      },
+      "speed": {
+        "name": "Geschwindigkeit"
+      },
+      "station_status": {
+        "name": "Stationsstatus",
+        "state": {
+          "current": "Aktuell",
+          "no_position": "Keine Position",
+          "stale": "Veraltet"
+        }
+      }
+    }
+  }
+}

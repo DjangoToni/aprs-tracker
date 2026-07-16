@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Sicherheitsproblem vertraulich melden
+    url: https://github.com/DjangoToni/aprs-tracker/security/advisories/new
+    about: Keine Sicherheitslücken oder Zugangsdaten öffentlich melden.

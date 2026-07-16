@@ -1,0 +1,30 @@
+"""Constants for APRS Monitor."""
+
+DOMAIN = "aprs_monitor"
+NAME = "APRS Monitor"
+VERSION = "1.0.0"
+
+CONF_API_KEY = "api_key"
+CONF_CALLSIGNS = "callsigns"
+CONF_DISPLAY_NAME = "display_name"
+CONF_HOME_RADIUS = "home_radius"
+CONF_MAX_POSITION_AGE = "max_position_age"
+CONF_MOVEMENT_SPEED_THRESHOLD = "movement_speed_threshold"
+CONF_UPDATE_INTERVAL = "update_interval"
+CONF_STATION_PROFILES = "station_profiles"
+MAX_CALLSIGNS = 20
+
+API_URL = "https://api.aprs.fi/api/get"
+DEFAULT_UPDATE_INTERVAL = 15
+MIN_UPDATE_INTERVAL = 5
+MAX_UPDATE_INTERVAL = 60
+DEFAULT_HOME_RADIUS = 25.0
+MIN_HOME_RADIUS = 1.0
+MAX_HOME_RADIUS = 1000.0
+DEFAULT_MOVEMENT_SPEED_THRESHOLD = 1.0
+MIN_MOVEMENT_SPEED_THRESHOLD = 0.5
+MAX_MOVEMENT_SPEED_THRESHOLD = 50.0
+DEFAULT_MAX_POSITION_AGE = 120
+MIN_MAX_POSITION_AGE = 15
+MAX_MAX_POSITION_AGE = 1440
+PLATFORMS = ["binary_sensor", "button", "device_tracker", "event", "sensor"]

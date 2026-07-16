@@ -1,0 +1,32 @@
+name: Funktionswunsch
+description: Eine neue, klar abgegrenzte Funktion vorschlagen
+title: "[Wunsch]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Anwendungsfall
+      description: Welches konkrete Problem soll gelöst werden?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Vorgeschlagene Lösung
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Bereits geprüfte Alternativen
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Projektumfang
+      options:
+        - label: Die Funktion ist für eine Home-Assistant-APRS-Integration geeignet.
+          required: true
+        - label: Der Vorschlag enthält keine API-Keys oder privaten Positionsdaten.
+          required: true

@@ -1,0 +1,63 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "api_connected": {
+        "default": "mdi:cloud-off-outline",
+        "state": {
+          "on": "mdi:cloud-check-outline"
+        }
+      },
+      "near_home": {
+        "default": "mdi:map-marker-radius-outline",
+        "state": {
+          "on": "mdi:map-marker-radius"
+        }
+      },
+      "moving": {
+        "default": "mdi:motion-sensor-off",
+        "state": {
+          "on": "mdi:motion-sensor"
+        }
+      },
+      "position_current": {
+        "default": "mdi:map-marker-alert-outline",
+        "state": {
+          "on": "mdi:map-marker-check"
+        }
+      }
+    },
+    "button": {
+      "refresh": {
+        "default": "mdi:refresh"
+      }
+    },
+    "event": {
+      "connection_activity": {
+        "default": "mdi:cloud-sync"
+      },
+      "station_activity": {
+        "default": "mdi:radio-tower"
+      }
+    },
+    "sensor": {
+      "last_successful_update": {
+        "default": "mdi:cloud-clock-outline"
+      },
+      "overall_status": {
+        "default": "mdi:heart-pulse"
+      },
+      "aprs_symbol": {
+        "default": "mdi:map-marker-star"
+      },
+      "course_direction": {
+        "default": "mdi:compass-rose"
+      },
+      "position_age": {
+        "default": "mdi:timer-marker-outline"
+      },
+      "station_status": {
+        "default": "mdi:list-status"
+      }
+    }
+  }
+}
