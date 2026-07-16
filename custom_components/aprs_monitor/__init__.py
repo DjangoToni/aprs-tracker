@@ -3,6 +3,7 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryError
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -25,6 +26,8 @@ from .const import (
 from .coordinator import AprsMonitorCoordinator
 from .device_cleanup import should_remove_aprs_device
 from .migration import normalized_runtime_options
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
