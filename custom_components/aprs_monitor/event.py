@@ -160,15 +160,11 @@ class AprsStationActivityEvent(CoordinatorEntity, EventEntity):
                 2,
             )
         if event_type in {"movement_started", "movement_stopped"}:
-            attributes["movement_speed_threshold_kmh"] = (
-                self.coordinator.profile(
-                    self._callsign
-                ).movement_speed_threshold_kmh
-            )
-        if event_type in {"entered_home_radius", "left_home_radius"}:
-            attributes["home_radius_km"] = self.coordinator.profile(
+            attributes["movement_speed_threshold_kmh"] = self.coordinator.profile(
                 self._callsign
-            ).home_radius_km
+            ).movement_speed_threshold_kmh
+        if event_type in {"entered_home_radius", "left_home_radius"}:
+            attributes["home_radius_km"] = self.coordinator.profile(self._callsign).home_radius_km
         if event_type in {"entered_zone", "left_zone"}:
             event_zone = current if event_type == "entered_zone" else previous
             attributes.update(

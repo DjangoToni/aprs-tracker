@@ -37,6 +37,7 @@ class AprsMonitorCoordinator(DataUpdateCoordinator):
         max_position_age: int,
         home_radius_km: float,
         movement_speed_threshold_kmh: float,
+        map_marker_style: str,
         raw_station_profiles: dict,
     ):
         super().__init__(
@@ -52,6 +53,7 @@ class AprsMonitorCoordinator(DataUpdateCoordinator):
         self.max_position_age = max_position_age
         self.home_radius_km = home_radius_km
         self.movement_speed_threshold_kmh = movement_speed_threshold_kmh
+        self.map_marker_style = map_marker_style
         self.station_profiles = build_station_profiles(
             callsigns,
             raw_station_profiles,

@@ -15,10 +15,26 @@ views. The zone view uses each tracker's Home Assistant state as its label and
 shows the latest station activity events beside the map. Replace the zone and
 event placeholders just like the tracker placeholders.
 
-The symbol view renders each tracker's dynamic APRS-derived icon. The telemetry
-view uses the tracker's `map_label` attribute to show its display name, speed,
-course direction, and altitude in one compact marker label. Missing APRS values
-are omitted automatically.
+Before using the symbol view, register this URL as a JavaScript module under
+**Settings > Dashboards > Resources** and refresh the browser:
+
+```text
+/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0
+```
+
+The symbol view uses `custom:aprs-monitor-map-card` to render the original APRS
+graphic and show callsign, speed, direction, altitude, coordinates, and last-seen
+time on hover. Clicking the symbol opens Home Assistant's normal entity details.
+The included example enables `scroll_wheel_zoom: true`, so the map zooms around
+the mouse pointer; remove that line if dashboard page scrolling should take
+priority.
+The separate telemetry view uses the tracker's `map_details` attribute as a text
+marker for installations that prefer the standard Home Assistant map card.
+Missing APRS telemetry values are omitted automatically.
+
+The custom map card always uses the locally rendered APRS pictogram. The global
+**Map marker style** integration option continues to control standard Home
+Assistant map cards.
 
 The zone arrival/departure blueprint filters `entered_zone` and `left_zone`
 events for one selected active Home Assistant zone. It provides independent

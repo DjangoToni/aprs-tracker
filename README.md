@@ -1,4 +1,4 @@
-# APRS Monitor 1.2.0
+# APRS Monitor 1.3.0
 
 APRS Monitor is a tested Home Assistant custom integration for tracking multiple
 amateur-radio stations through the aprs.fi API.
@@ -25,7 +25,7 @@ Published releases use the fixed HACS asset name `aprs_monitor.zip`.
 
 ## Optional dashboards and automation blueprints
 
-Release 1.2.0 provides a separate `aprs_monitor-1.2.0-extras.zip`. Extract it
+Release 1.3.0 provides a separate `aprs_monitor-1.3.0-extras.zip`. Extract it
 directly into Home Assistant's `/config` directory. It installs:
 
 - `/config/blueprints/automation/aprs_monitor/station_activity_actions.yaml`
@@ -97,6 +97,16 @@ balloons, ships, weather stations, emergency vehicles, radio sites, and several
 other station types therefore appear with a meaningful icon on Home Assistant
 maps. Missing or unknown APRS symbols use a standard map marker.
 
+Version 1.3 adds the original aprs.fi APRS symbol graphics. Open the integration's
+**Configure** dialog and change **Map marker style** from the compatible Home
+Assistant station icon to **Original APRS symbol graphic**. Home Assistant then
+crops the actual pictogram from the bundled primary or alternate APRS table and
+applies alphanumeric overlays where required. Images are served locally without
+requests to an image service and contain no callsign or position data. Switching
+the style reloads the integration but preserves tracker entity IDs and history.
+The graphics come from the [open aprs.fi symbol set](https://github.com/hessu/aprs-symbols),
+with its complete per-symbol attribution included in the integration package.
+
 The raw symbol remains available in the `APRS symbol` sensor and the tracker's
 `symbol` attribute. The tracker also exposes `aprs_symbol_character` and
 `aprs_symbol_icon`; the original APRS comment remains in the `comment` attribute.
@@ -107,8 +117,46 @@ Assistant's standard map card. It combines the station profile display name with
 available speed, eight-point course direction, and altitude, for example
 `HB9ABC · 46 km/h · SE · 408 m`. Missing values are omitted. Configure a map
 entity with `label_mode: attribute` and `attribute: map_label` to use it. The
-extras dashboard contains separate zone, symbol, telemetry, and 24-hour history
-views.
+more detailed `map_details` attribute additionally includes the callsign, course
+in degrees, and coordinates, for example
+`Rescue 1 (HB9ABC) · 46 km/h · SE (123°) · 408 m · 47.37690, 8.54170`.
+The extras dashboard uses this detailed label in its telemetry view and keeps a
+separate symbol view for the original APRS graphics. Home Assistant's standard
+map card does not support custom multi-field hover tooltips.
+
+### APRS Monitor Map Card
+
+Version 1.3 includes the optional `custom:aprs-monitor-map-card`. It preserves
+the original APRS pictograms and shows callsign, speed, cardinal and degree
+course, altitude, coordinates, and last-seen time in a localized hover tooltip.
+The card reads the existing tracker states and creates no additional aprs.fi
+requests. Leaflet 1.9.4 is bundled locally under its BSD 2-Clause license; no
+external JavaScript CDN is used.
+
+Register this JavaScript module once under **Settings > Dashboards > Resources**:
+
+```text
+/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0
+```
+
+Then use it in a manual card:
+
+```yaml
+type: custom:aprs-monitor-map-card
+title: APRS Live
+height: 500
+auto_fit: true
+scroll_wheel_zoom: true
+entities:
+  - device_tracker.first_callsign
+  - device_tracker.second_callsign
+```
+
+Clicking a marker opens Home Assistant's normal entity details. Mouse-wheel zoom
+is enabled explicitly in this example and remains opt-in so ordinary dashboard
+scrolling is not captured unexpectedly. `tile_url`, `attribution`, `zoom`, and
+`max_zoom` are optional advanced settings. The default map tiles are provided by
+OpenStreetMap and require network access, just like other online tile maps.
 
 ## Station activity events
 
@@ -157,6 +205,7 @@ Open **Settings > Devices & services > APRS Monitor > Configure** to change:
 - the maximum position age from 15 to 1440 minutes (default: 120 minutes)
 - the near-home radius from 1 to 1000 kilometers (default: 25 kilometers)
 - the movement threshold from 0.5 to 50 km/h (default: 1 km/h)
+- the map marker style (`Home Assistant station icon` or `Original APRS symbol graphic`)
 
 Saving options reloads the integration automatically. The API key remains
 unchanged.

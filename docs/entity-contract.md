@@ -27,8 +27,12 @@ The five hub entities append:
 Callsigns and config-entry IDs remain the identity sources. Station profile display
 names never participate in a device or entity unique ID.
 
-Tracker attributes, including the version 1.1 `map_label`, are presentation data
-and do not change this unique-ID contract.
+Tracker attributes, including the version 1.1 `map_label` and version 1.3
+`map_details`, are presentation data and do not change this unique-ID contract.
 
 Version 1.2 adds `entered_zone` and `left_zone` to the existing station activity
 event entity. No entity or device unique ID changes, and no migration is required.
+
+Version 1.3 adds the optional `entity_picture` and `aprs_symbol_picture` tracker
+attributes. They are presentation data; selecting APRS symbol graphics does not
+change entity IDs, devices, automations, or Recorder history.

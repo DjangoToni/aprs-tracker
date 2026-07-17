@@ -70,10 +70,7 @@ def initial_bearing_degrees(
     target_latitude_rad = math.radians(target_latitude)
     longitude_delta = math.radians(target_longitude - origin_longitude)
     x = math.sin(longitude_delta) * math.cos(target_latitude_rad)
-    y = (
-        math.cos(origin_latitude_rad) * math.sin(target_latitude_rad)
-        - math.sin(origin_latitude_rad)
-        * math.cos(target_latitude_rad)
-        * math.cos(longitude_delta)
-    )
+    y = math.cos(origin_latitude_rad) * math.sin(target_latitude_rad) - math.sin(
+        origin_latitude_rad
+    ) * math.cos(target_latitude_rad) * math.cos(longitude_delta)
     return (math.degrees(math.atan2(x, y)) + 360) % 360

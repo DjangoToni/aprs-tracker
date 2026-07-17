@@ -45,13 +45,17 @@ discover the integration in that structure.
 
 ## Optional dashboards and blueprints
 
-1. Download `aprs_monitor-<version>-extras.zip` from the same release.
-2. Extract it directly into Home Assistant's `/config` directory.
-3. Replace every `REPLACE_WITH_...` placeholder in
+1. Register `/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0` as a
+   JavaScript module under **Settings > Dashboards > Resources**, then refresh
+   the browser. This enables the optional map with APRS graphics and telemetry
+   hover tooltips.
+2. Download `aprs_monitor-<version>-extras.zip` from the same release.
+3. Extract it directly into Home Assistant's `/config` directory.
+4. Replace every `REPLACE_WITH_...` placeholder in
    `/config/aprs_monitor_examples/dashboard.yaml` with an entity ID from your
    Home Assistant instance.
-4. Add the required cards to a dashboard as manual YAML cards.
-5. Reload automations or restart Home Assistant before using the included
+5. Add the required cards to a dashboard as manual YAML cards.
+6. Reload automations or restart Home Assistant before using the included
    blueprints.
 
 The extras archive is optional. APRS Monitor itself works without it.
@@ -83,4 +87,3 @@ preserved by a normal update.
 
 For a production upgrade or rollback, also read the
 [German backup and rollback guide](upgrade.de.md).
-

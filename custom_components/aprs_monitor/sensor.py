@@ -229,9 +229,7 @@ class AprsMonitorSensor(CoordinatorEntity, SensorEntity):
                 position,
                 self.coordinator.profile(self._callsign).max_position_age,
             ),
-            "stale_after_minutes": self.coordinator.profile(
-                self._callsign
-            ).max_position_age,
+            "stale_after_minutes": self.coordinator.profile(self._callsign).max_position_age,
         }
 
     @property
@@ -265,11 +263,7 @@ class AprsStationStatusSensor(CoordinatorEntity, SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, int]:
         """Expose the configured freshness limit."""
-        return {
-            "stale_after_minutes": self.coordinator.profile(
-                self._callsign
-            ).max_position_age
-        }
+        return {"stale_after_minutes": self.coordinator.profile(self._callsign).max_position_age}
 
 
 class AprsOverallStatusSensor(CoordinatorEntity, SensorEntity):

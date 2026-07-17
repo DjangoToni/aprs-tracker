@@ -45,12 +45,16 @@ Home Assistant die Integration nicht finden.
 
 ## Optionale Dashboards und Blueprints
 
-1. Lade `aprs_monitor-<version>-extras.zip` vom selben Release herunter.
-2. Entpacke es direkt in das Home-Assistant-Verzeichnis `/config`.
-3. Ersetze in `/config/aprs_monitor_examples/dashboard.yaml` alle Platzhalter
+1. Trage `/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0` unter
+   **Einstellungen > Dashboards > Ressourcen** als JavaScript-Modul ein und
+   aktualisiere danach die Browserseite. Damit wird die optionale Karte mit
+   APRS-Grafiken und Telemetrie-Hovertext aktiviert.
+2. Lade `aprs_monitor-<version>-extras.zip` vom selben Release herunter.
+3. Entpacke es direkt in das Home-Assistant-Verzeichnis `/config`.
+4. Ersetze in `/config/aprs_monitor_examples/dashboard.yaml` alle Platzhalter
    `REPLACE_WITH_...` durch Entity-IDs aus deiner Home-Assistant-Installation.
-4. Füge die gewünschten Karten als manuelle YAML-Karten in ein Dashboard ein.
-5. Lade die Automationen neu oder starte Home Assistant neu, bevor du die
+5. Füge die gewünschten Karten als manuelle YAML-Karten in ein Dashboard ein.
+6. Lade die Automationen neu oder starte Home Assistant neu, bevor du die
    mitgelieferten Blueprints verwendest.
 
 Das Extras-Paket ist optional. APRS Monitor funktioniert auch ohne dieses Paket.
@@ -84,4 +88,3 @@ bei einem normalen Update erhalten.
 
 Für produktive Aktualisierungen und Wiederherstellungen lies zusätzlich die
 [Anleitung zu Sicherung und Rollback](upgrade.de.md).
-

@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.3.0 - 2026-07-18
+
+- Added the original aprs.fi APRS pictograms as optional Home Assistant map markers.
+- Preserved both APRS table and station-type characters, including symbols that
+  do not have a dedicated MDI mapping.
+- Added a translated map-marker-style option while retaining MDI icons as the
+  compatible default for existing installations.
+- Cropped primary and alternate APRS sprite tables locally, including overlays,
+  without external image requests, callsigns, coordinates, comments, or credentials.
+- Preserved tracker unique IDs, devices, automations, Recorder history, and the
+  existing aprs.fi request count when switching marker styles.
+- Added a `map_details` tracker attribute and telemetry-map labels containing
+  callsign, speed, cardinal and degree course, altitude, and coordinates.
+- Added the optional APRS Monitor Map Card with original APRS graphics,
+  localized telemetry hover tooltips, automatic fitting, and marker click-through
+  to Home Assistant entity details.
+- Bundled pinned Leaflet 1.9.4 assets and their BSD 2-Clause license locally,
+  without an external JavaScript CDN or additional aprs.fi requests.
+- Enabled pointer-centered mouse-wheel zoom in the bundled APRS Live dashboard
+  example while keeping it configurable per map card.
+
 ## 1.2.0 - 2026-07-17
 
 - Added `entered_zone` and `left_zone` station events using Home Assistant's

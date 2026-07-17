@@ -2,13 +2,14 @@
 
 DOMAIN = "aprs_monitor"
 NAME = "APRS Monitor"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 CONF_API_KEY = "api_key"
 CONF_CALLSIGNS = "callsigns"
 CONF_DISPLAY_NAME = "display_name"
 CONF_HOME_RADIUS = "home_radius"
 CONF_MAX_POSITION_AGE = "max_position_age"
+CONF_MAP_MARKER_STYLE = "map_marker_style"
 CONF_MOVEMENT_SPEED_THRESHOLD = "movement_speed_threshold"
 CONF_UPDATE_INTERVAL = "update_interval"
 CONF_STATION_PROFILES = "station_profiles"
@@ -27,4 +28,9 @@ MAX_MOVEMENT_SPEED_THRESHOLD = 50.0
 DEFAULT_MAX_POSITION_AGE = 120
 MIN_MAX_POSITION_AGE = 15
 MAX_MAX_POSITION_AGE = 1440
+MAP_MARKER_STYLE_MDI = "mdi"
+MAP_MARKER_STYLE_APRS = "aprs"
+MAP_MARKER_STYLES = (MAP_MARKER_STYLE_MDI, MAP_MARKER_STYLE_APRS)
+DEFAULT_MAP_MARKER_STYLE = MAP_MARKER_STYLE_MDI
 PLATFORMS = ["binary_sensor", "button", "device_tracker", "event", "sensor"]
+SYMBOL_TOKEN_DATA = f"{DOMAIN}_symbol_token"

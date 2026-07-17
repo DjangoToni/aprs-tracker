@@ -29,6 +29,7 @@ def test_required_component_files_exist() -> None:
         "icons.json",
         "sensor.py",
         "station_summary.py",
+        "symbol_view.py",
         "strings.json",
         "system_health.py",
     ):
@@ -40,7 +41,7 @@ def test_manifest_exposes_config_flow() -> None:
     assert manifest["domain"] == "aprs_monitor"
     assert manifest["name"] == "APRS Monitor"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "1.2.0"
+    assert manifest["version"] == "1.3.0"
     assert manifest["iot_class"] == "cloud_polling"
     assert manifest["integration_type"] == "hub"
     assert manifest["single_config_entry"] is True
@@ -51,6 +52,34 @@ def test_brand_icons_exist() -> None:
     """Ship the local brand assets required by HACS."""
     assert (COMPONENT / "brand" / "icon.png").is_file()
     assert (COMPONENT / "brand" / "icon@2x.png").is_file()
+
+
+def test_bundled_aprs_symbol_assets_include_attribution() -> None:
+    assets = COMPONENT / "aprs_symbol_assets"
+    for filename in (
+        "aprs-symbols-64-0.png",
+        "aprs-symbols-64-1.png",
+        "aprs-symbols-64-2.png",
+        "COPYRIGHT.md",
+        "SOURCE.md",
+    ):
+        assert (assets / filename).is_file()
+
+
+def test_bundled_map_card_includes_pinned_leaflet_and_license() -> None:
+    frontend = COMPONENT / "frontend"
+    vendor = frontend / "vendor" / "leaflet"
+    assert (frontend / "aprs-monitor-map-card.js").is_file()
+    assert (frontend / "SOURCE.md").is_file()
+    assert (vendor / "leaflet.js").stat().st_size > 100_000
+    assert (vendor / "leaflet.css").is_file()
+    assert "BSD 2-Clause" in (vendor / "LICENSE").read_text(encoding="utf-8")
+
+
+def test_map_card_is_served_through_home_assistant_static_paths() -> None:
+    init_source = (COMPONENT / "__init__.py").read_text(encoding="utf-8")
+    assert "async_register_static_paths" in init_source
+    assert '"/api/aprs_monitor/frontend"' in init_source
 
 
 def test_platform_modules_are_preloaded_before_forwarding() -> None:
@@ -136,9 +165,7 @@ def test_station_activity_event_has_translations_and_icon() -> None:
     assert event_states["position_lost"] == "Position lost"
     assert event_states["entered_zone"] == "Entered zone"
     assert event_states["left_zone"] == "Left zone"
-    assert icons["entity"]["event"]["station_activity"]["default"] == (
-        "mdi:radio-tower"
-    )
+    assert icons["entity"]["event"]["station_activity"]["default"] == ("mdi:radio-tower")
 
 
 def test_hub_entities_have_translations_and_icons() -> None:
@@ -147,9 +174,7 @@ def test_hub_entities_have_translations_and_icons() -> None:
     assert "api_connected" in strings["entity"]["binary_sensor"]
     assert "refresh" in strings["entity"]["button"]
     assert "connection_activity" in strings["entity"]["event"]
-    assert strings["entity"]["sensor"]["overall_status"]["state"]["error"] == (
-        "Error"
-    )
+    assert strings["entity"]["sensor"]["overall_status"]["state"]["error"] == ("Error")
     assert icons["entity"]["button"]["refresh"]["default"] == "mdi:refresh"
 
 
