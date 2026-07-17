@@ -10,6 +10,11 @@ The dashboard example is installed as
 `REPLACE_WITH_...` placeholder with the corresponding entity ID from your Home
 Assistant instance, then copy the YAML into a new manual dashboard.
 
-The map card uses Home Assistant Recorder history for a 24-hour track. Change
-`hours_to_show` as desired. The integration performs no additional API requests
-for this history.
+The dashboard contains separate symbol, telemetry, and 24-hour history views.
+The symbol view renders each tracker's dynamic APRS-derived icon. The telemetry
+view uses the tracker's `map_label` attribute to show its display name, speed,
+course direction, and altitude in one compact marker label. Missing APRS values
+are omitted automatically.
+
+The history view uses Home Assistant Recorder data. Change `hours_to_show` as
+desired. None of the map views perform additional aprs.fi requests.

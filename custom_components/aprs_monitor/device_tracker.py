@@ -13,6 +13,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .api import Position, is_position_stale, position_age_minutes
 from .aprs_symbols import aprs_symbol_character, aprs_symbol_icon
 from .const import DOMAIN
+from .geo import course_to_cardinal_abbreviation
 from .hub import station_device_info
 
 PARALLEL_UPDATES = 0
@@ -89,10 +90,22 @@ class AprsMonitorTracker(CoordinatorEntity, TrackerEntity):
                 position,
                 self.coordinator.profile(self._callsign).max_position_age,
             ),
+            "map_label": self._map_label(position),
             "stale_after_minutes": self.coordinator.profile(
                 self._callsign
             ).max_position_age,
         }
+
+    def _map_label(self, position: Position) -> str:
+        """Return a compact label for Home Assistant's standard map card."""
+        parts = [self.coordinator.profile(self._callsign).display_name]
+        if position.speed_kmh is not None:
+            parts.append(f"{position.speed_kmh:.0f} km/h")
+        if direction := course_to_cardinal_abbreviation(position.course):
+            parts.append(direction)
+        if position.altitude_m is not None:
+            parts.append(f"{position.altitude_m:.0f} m")
+        return " · ".join(parts)
 
     @property
     def _position(self) -> Position | None:

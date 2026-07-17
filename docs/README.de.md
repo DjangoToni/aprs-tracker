@@ -1,4 +1,7 @@
-# APRS Monitor 1.0.0 für Home Assistant
+# APRS Monitor 1.1.0 für Home Assistant
+
+Installationsanleitungen: [Deutsch](installation.de.md) ·
+[English](installation.md)
 
 APRS Monitor verfolgt bis zu 20 APRS-Rufzeichen über die aprs.fi-API. Die
 Integration ist ausschließlich lesend und sendet weder APRS-Pakete noch
@@ -40,9 +43,12 @@ Anzeigenamen verändern keine Geräteidentitäten, Entity-IDs oder Verlaufsdaten
 ## Karte und Automationen
 
 Bekannte APRS-Symbole werden in passende Home-Assistant-Kartensymbole übersetzt.
-Das optionale Extras-Paket enthält zwei Automations-Blueprints und eine
-Dashboard-Vorlage mit Recorder-basierter Positionsspur. Das Extras-Paket wird
-direkt nach `/config` entpackt.
+Jeder aktuelle Tracker besitzt zusätzlich das Attribut `map_label`. Es verbindet
+Anzeigename, Geschwindigkeit, achtteilige Kursrichtung und Höhe zu einer kompakten
+Kartenbeschriftung; fehlende APRS-Werte werden ausgelassen. Das optionale
+Extras-Paket enthält zwei Automations-Blueprints und ein Dashboard mit getrennten
+Symbol-, Telemetrie- und 24-Stunden-Verlaufsansichten. Das Extras-Paket wird direkt
+nach `/config` entpackt.
 
 ## Zustände und Fehler
 

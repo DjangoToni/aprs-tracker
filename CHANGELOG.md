@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.0 - 2026-07-16
+
+- Added detailed English and German installation guides for HACS, manual setup,
+  optional extras, updates, and troubleshooting.
+
+- Added a compact `map_label` tracker attribute combining the station display
+  name with available speed, course direction, and altitude.
+- Omitted missing telemetry values from map labels without creating additional
+  entities or aprs.fi requests.
+- Expanded the optional dashboard into separate APRS symbol, telemetry, and
+  24-hour Recorder history views.
+- Added explicit map icon, label-mode, zone-fitting, and non-clustered marker
+  examples for Home Assistant's standard map card.
+
 ## 1.0.0 - 2026-07-16
 
 - Declared the config schema, station and hub unique IDs, migration behavior, and

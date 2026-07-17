@@ -15,6 +15,7 @@ CARDINAL_DIRECTIONS = (
     "west",
     "northwest",
 )
+CARDINAL_ABBREVIATIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 
 
 def course_to_cardinal(course: float | None) -> str | None:
@@ -23,6 +24,14 @@ def course_to_cardinal(course: float | None) -> str | None:
         return None
     normalized = course % 360
     return CARDINAL_DIRECTIONS[int((normalized + 22.5) // 45) % 8]
+
+
+def course_to_cardinal_abbreviation(course: float | None) -> str | None:
+    """Convert a course into a compact eight-point map abbreviation."""
+    if course is None:
+        return None
+    normalized = course % 360
+    return CARDINAL_ABBREVIATIONS[int((normalized + 22.5) // 45) % 8]
 
 
 def great_circle_distance_km(

@@ -4,9 +4,17 @@ import pytest
 
 from custom_components.aprs_monitor.geo import (
     course_to_cardinal,
+    course_to_cardinal_abbreviation,
     great_circle_distance_km,
     initial_bearing_degrees,
 )
+
+
+def test_course_to_cardinal_abbreviation() -> None:
+    assert course_to_cardinal_abbreviation(0) == "N"
+    assert course_to_cardinal_abbreviation(123) == "SE"
+    assert course_to_cardinal_abbreviation(270) == "W"
+    assert course_to_cardinal_abbreviation(None) is None
 
 
 def test_cardinal_distance_and_bearing() -> None:
