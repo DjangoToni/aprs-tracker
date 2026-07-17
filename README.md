@@ -1,9 +1,12 @@
-# APRS Monitor 1.0.0
+# APRS Monitor 1.1.0
 
 APRS Monitor is a tested Home Assistant custom integration for tracking multiple
 amateur-radio stations through the aprs.fi API.
 
 German documentation is available in [docs/README.de.md](docs/README.de.md).
+
+Installation guides: [English](docs/installation.md) ·
+[Deutsch](docs/installation.de.md)
 
 ## Requirements
 
@@ -22,7 +25,7 @@ Published releases use the fixed HACS asset name `aprs_monitor.zip`.
 
 ## Optional dashboards and automation blueprints
 
-Release 1.0.0 provides a separate `aprs_monitor-1.0.0-extras.zip`. Extract it
+Release 1.1.0 provides a separate `aprs_monitor-1.1.0-extras.zip`. Extract it
 directly into Home Assistant's `/config` directory. It installs:
 
 - `/config/blueprints/automation/aprs_monitor/station_activity_actions.yaml`
@@ -97,6 +100,13 @@ The raw symbol remains available in the `APRS symbol` sensor and the tracker's
 `symbol` attribute. The tracker also exposes `aprs_symbol_character` and
 `aprs_symbol_icon`; the original APRS comment remains in the `comment` attribute.
 No symbol or comment content is included in downloaded diagnostics.
+
+Every current tracker also exposes a compact `map_label` attribute for Home
+Assistant's standard map card. It combines the station profile display name with
+available speed, eight-point course direction, and altitude, for example
+`HB9ABC · 46 km/h · SE · 408 m`. Missing values are omitted. Configure a map
+entity with `label_mode: attribute` and `attribute: map_label` to use it. The
+extras dashboard contains separate symbol, telemetry, and 24-hour history views.
 
 ## Station activity events
 

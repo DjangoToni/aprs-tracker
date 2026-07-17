@@ -26,3 +26,6 @@ The five hub entities append:
 
 Callsigns and config-entry IDs remain the identity sources. Station profile display
 names never participate in a device or entity unique ID.
+
+Tracker attributes, including the version 1.1 `map_label`, are presentation data
+and do not change this unique-ID contract.

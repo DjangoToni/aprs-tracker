@@ -40,7 +40,7 @@ def test_manifest_exposes_config_flow() -> None:
     assert manifest["domain"] == "aprs_monitor"
     assert manifest["name"] == "APRS Monitor"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "1.0.0"
+    assert manifest["version"] == "1.1.0"
     assert manifest["iot_class"] == "cloud_polling"
     assert manifest["integration_type"] == "hub"
     assert manifest["single_config_entry"] is True

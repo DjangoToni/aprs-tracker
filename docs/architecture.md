@@ -53,6 +53,11 @@ MDI icons used by Home Assistant maps. The complete raw APRS symbol remains
 unchanged in entity data. Unknown symbol characters fall back to `mdi:map-marker`.
 Symbol and comment values remain excluded from config-entry diagnostics.
 
+Version 1.1 adds a presentation-only `map_label` tracker attribute. It combines
+the effective station display name with available speed, compact course direction,
+and altitude. Formatting is local, creates no additional entity or API request,
+and omits unknown telemetry instead of inserting placeholder values.
+
 The activity event entity stores a snapshot after each successful coordinator
 update and emits only meaningful transitions. Its first snapshot is established
 during entity construction, preventing false startup and reload events. Failed

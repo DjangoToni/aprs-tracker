@@ -4,14 +4,6 @@ views:
     path: aprs-monitor
     icon: mdi:radio-tower
     cards:
-      - type: map
-        title: APRS-Stationen
-        hours_to_show: 24
-        auto_fit: true
-        entities:
-          - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
-          - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
-          - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
       - type: entities
         title: Kontrollzentrum
         show_header_toggle: false
@@ -32,3 +24,67 @@ views:
           - sensor.REPLACE_WITH_POSITION_AGE
           - binary_sensor.REPLACE_WITH_MOVING
           - binary_sensor.REPLACE_WITH_NEAR_HOME
+
+  - title: Symbole
+    path: aprs-symbols
+    icon: mdi:map-marker-multiple
+    cards:
+      - type: map
+        title: APRS-Symbole
+        auto_fit: true
+        fit_zones: true
+        cluster: false
+        theme_mode: auto
+        entities:
+          - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
+            label_mode: icon
+          - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
+            label_mode: icon
+          - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
+            label_mode: icon
+          - entity: zone.home
+            focus: false
+
+  - title: Telemetrie
+    path: aprs-telemetry
+    icon: mdi:speedometer
+    cards:
+      - type: map
+        title: APRS-Telemetrie
+        auto_fit: true
+        fit_zones: true
+        cluster: false
+        theme_mode: auto
+        entities:
+          - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
+            label_mode: attribute
+            attribute: map_label
+          - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
+            label_mode: attribute
+            attribute: map_label
+          - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
+            label_mode: attribute
+            attribute: map_label
+          - entity: zone.home
+            focus: false
+
+  - title: Verlauf
+    path: aprs-history
+    icon: mdi:map-clock
+    cards:
+      - type: map
+        title: APRS-Verlauf – 24 Stunden
+        hours_to_show: 24
+        auto_fit: true
+        fit_zones: true
+        cluster: false
+        theme_mode: auto
+        entities:
+          - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
+            label_mode: icon
+          - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
+            label_mode: icon
+          - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
+            label_mode: icon
+          - entity: zone.home
+            focus: false

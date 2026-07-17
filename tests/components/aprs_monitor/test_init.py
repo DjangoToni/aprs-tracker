@@ -84,6 +84,7 @@ async def test_setup_creates_tracker_and_station_entities(
     assert tracker.attributes["icon"] == "mdi:car"
     assert tracker.attributes["aprs_symbol_character"] == ">"
     assert tracker.attributes["aprs_symbol_icon"] == "mdi:car"
+    assert tracker.attributes["map_label"] == "HB9TST · 46 km/h · SE · 408 m"
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_speed"].state == "45.6"
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_course"].state == "123.0"
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_course_direction"].state == (
@@ -233,6 +234,10 @@ async def test_station_profile_applies_name_and_individual_thresholds(
         await hass.async_block_till_done()
 
     states = _states_by_unique_id(hass, config_entry.entry_id)
+    tracker = states[f"{config_entry.entry_id}_{CALLSIGN}"]
+    assert tracker.attributes["map_label"] == (
+        "Einsatzfahrzeug · 46 km/h · SE · 408 m"
+    )
     assert states[f"{config_entry.entry_id}_{CALLSIGN}_near_home"].state == "on"
     moving = states[f"{config_entry.entry_id}_{CALLSIGN}_moving"]
     assert moving.state == "off"
@@ -356,6 +361,8 @@ async def test_missing_speed_makes_movement_unknown(
     states = _states_by_unique_id(hass, loaded_entry.entry_id)
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_moving"].state == STATE_UNAVAILABLE
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_position_current"].state == "on"
+    tracker = states[f"{loaded_entry.entry_id}_{CALLSIGN}"]
+    assert tracker.attributes["map_label"] == "HB9TST · SE · 408 m"
 
 
 async def test_missing_position_has_explicit_station_status(

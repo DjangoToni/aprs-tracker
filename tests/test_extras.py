@@ -8,6 +8,11 @@ ROOT = Path(__file__).parents[1]
 def test_dashboard_uses_recorder_track_and_explicit_placeholders() -> None:
     dashboard = (ROOT / "examples" / "dashboard.yaml").read_text(encoding="utf-8")
     assert "hours_to_show: 24" in dashboard
+    assert dashboard.count("- type: map") == 3
+    assert "label_mode: icon" in dashboard
+    assert "attribute: map_label" in dashboard
+    assert "cluster: false" in dashboard
+    assert "fit_zones: true" in dashboard
     assert "device_tracker.REPLACE_WITH_FIRST_TRACKER" in dashboard
     assert "button.REPLACE_WITH_REFRESH" in dashboard
 
