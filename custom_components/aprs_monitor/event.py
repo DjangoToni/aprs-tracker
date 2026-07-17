@@ -2,15 +2,22 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Any
 
 from homeassistant.components.event import EventEntity
+from homeassistant.components.zone import async_active_zone
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .activity import EVENT_TYPES, activity_transitions, build_activity_snapshot
+from .activity import (
+    EVENT_TYPES,
+    StationActivitySnapshot,
+    activity_transitions,
+    build_activity_snapshot,
+)
 from .api import Position, position_age_minutes
 from .const import DOMAIN
 from .geo import great_circle_distance_km
@@ -86,7 +93,10 @@ class AprsStationActivityEvent(CoordinatorEntity, EventEntity):
         if self.coordinator.last_update_success:
             current = self._activity_snapshot
             for event_type in activity_transitions(self._snapshot, current):
-                self._trigger_event(event_type, self._event_attributes(event_type))
+                self._trigger_event(
+                    event_type,
+                    self._event_attributes(event_type, self._snapshot, current),
+                )
                 self.async_write_ha_state()
             self._snapshot = current
         super()._handle_coordinator_update()
@@ -96,9 +106,9 @@ class AprsStationActivityEvent(CoordinatorEntity, EventEntity):
         return (self.coordinator.data or {}).get(self._callsign)
 
     @property
-    def _activity_snapshot(self):
+    def _activity_snapshot(self) -> StationActivitySnapshot:
         profile = self.coordinator.profile(self._callsign)
-        return build_activity_snapshot(
+        snapshot = build_activity_snapshot(
             self._position,
             profile.max_position_age,
             profile.movement_speed_threshold_kmh,
@@ -106,14 +116,37 @@ class AprsStationActivityEvent(CoordinatorEntity, EventEntity):
             self._hass.config.latitude,
             self._hass.config.longitude,
         )
+        position = self._position
+        if position is None or snapshot.status != "current":
+            return snapshot
+        zone = async_active_zone(
+            self._hass,
+            position.latitude,
+            position.longitude,
+        )
+        if zone is None:
+            return snapshot
+        return replace(
+            snapshot,
+            zone_entity_id=zone.entity_id,
+            zone_name=zone.name,
+        )
 
-    def _event_attributes(self, event_type: str) -> dict[str, Any]:
+    def _event_attributes(
+        self,
+        event_type: str,
+        previous: StationActivitySnapshot,
+        current: StationActivitySnapshot,
+    ) -> dict[str, Any]:
         """Return useful non-coordinate automation context for an event."""
         position = self._position
         attributes: dict[str, Any] = {
             "callsign": self._callsign,
-            "status": self._activity_snapshot.status,
+            "status": current.status,
         }
+        if current.zone_entity_id is not None:
+            attributes["active_zone_entity_id"] = current.zone_entity_id
+            attributes["active_zone_name"] = current.zone_name
         if position is not None:
             attributes["position_age_minutes"] = position_age_minutes(position)
             attributes["speed_kmh"] = position.speed_kmh
@@ -136,4 +169,16 @@ class AprsStationActivityEvent(CoordinatorEntity, EventEntity):
             attributes["home_radius_km"] = self.coordinator.profile(
                 self._callsign
             ).home_radius_km
+        if event_type in {"entered_zone", "left_zone"}:
+            event_zone = current if event_type == "entered_zone" else previous
+            attributes.update(
+                {
+                    "zone_entity_id": event_zone.zone_entity_id,
+                    "zone_name": event_zone.zone_name,
+                    "from_zone_entity_id": previous.zone_entity_id,
+                    "from_zone_name": previous.zone_name,
+                    "to_zone_entity_id": current.zone_entity_id,
+                    "to_zone_name": current.zone_name,
+                }
+            )
         return attributes

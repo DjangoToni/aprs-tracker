@@ -4,7 +4,14 @@ from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.const import STATE_UNAVAILABLE
+from homeassistant.components.zone import DATA_ZONE_ENTITY_IDS
+from homeassistant.components.zone.const import ATTR_PASSIVE, ATTR_RADIUS
+from homeassistant.const import (
+    ATTR_FRIENDLY_NAME,
+    ATTR_LATITUDE,
+    ATTR_LONGITUDE,
+    STATE_UNAVAILABLE,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
@@ -268,6 +275,92 @@ async def test_near_home_radius_transition(hass: HomeAssistant, loaded_entry) ->
     activity = states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_activity"]
     assert activity.attributes["event_type"] == "entered_home_radius"
     assert activity.attributes["home_radius_km"] == 100.0
+
+
+async def test_active_zone_entry_and_exit_events(
+    hass: HomeAssistant,
+    loaded_entry,
+    position: Position,
+) -> None:
+    """Emit useful zone transitions without exposing coordinates."""
+    coordinator = hass.data[DOMAIN][loaded_entry.entry_id]
+    hass.states.async_set(
+        "zone.radio_club",
+        "0",
+        {
+            ATTR_FRIENDLY_NAME: "Radio club",
+            ATTR_LATITUDE: position.latitude,
+            ATTR_LONGITUDE: position.longitude,
+            ATTR_RADIUS: 500.0,
+            ATTR_PASSIVE: False,
+        },
+    )
+    await hass.async_block_till_done()
+    assert "zone.radio_club" in hass.data[DATA_ZONE_ENTITY_IDS]
+
+    with patch(
+        "custom_components.aprs_monitor.coordinator.async_get_positions",
+        return_value={CALLSIGN: position},
+    ):
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+
+    states = _states_by_unique_id(hass, loaded_entry.entry_id)
+    activity = states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_activity"]
+    assert activity.attributes["event_type"] == "entered_zone"
+    assert activity.attributes["zone_entity_id"] == "zone.radio_club"
+    assert activity.attributes["zone_name"] == "Radio club"
+    assert activity.attributes["from_zone_entity_id"] is None
+    assert activity.attributes["to_zone_entity_id"] == "zone.radio_club"
+    assert "latitude" not in activity.attributes
+    assert "longitude" not in activity.attributes
+
+    outside = replace(position, latitude=46.0, longitude=7.0)
+    with patch(
+        "custom_components.aprs_monitor.coordinator.async_get_positions",
+        return_value={CALLSIGN: outside},
+    ):
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+
+    states = _states_by_unique_id(hass, loaded_entry.entry_id)
+    activity = states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_activity"]
+    assert activity.attributes["event_type"] == "left_zone"
+    assert activity.attributes["zone_entity_id"] == "zone.radio_club"
+    assert activity.attributes["from_zone_entity_id"] == "zone.radio_club"
+    assert activity.attributes["to_zone_entity_id"] is None
+
+
+async def test_passive_zone_does_not_emit_active_zone_event(
+    hass: HomeAssistant,
+    loaded_entry,
+    position: Position,
+) -> None:
+    """Follow Home Assistant semantics by ignoring passive zones as active zones."""
+    coordinator = hass.data[DOMAIN][loaded_entry.entry_id]
+    hass.states.async_set(
+        "zone.passive_area",
+        "0",
+        {
+            ATTR_FRIENDLY_NAME: "Passive area",
+            ATTR_LATITUDE: position.latitude,
+            ATTR_LONGITUDE: position.longitude,
+            ATTR_RADIUS: 500.0,
+            ATTR_PASSIVE: True,
+        },
+    )
+    await hass.async_block_till_done()
+
+    with patch(
+        "custom_components.aprs_monitor.coordinator.async_get_positions",
+        return_value={CALLSIGN: position},
+    ):
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+
+    states = _states_by_unique_id(hass, loaded_entry.entry_id)
+    activity = states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_activity"]
+    assert activity.attributes["event_type"] is None
 
 
 async def test_manual_refresh_button_requests_coordinator_update(

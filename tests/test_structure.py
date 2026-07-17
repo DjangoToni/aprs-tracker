@@ -40,7 +40,7 @@ def test_manifest_exposes_config_flow() -> None:
     assert manifest["domain"] == "aprs_monitor"
     assert manifest["name"] == "APRS Monitor"
     assert manifest["config_flow"] is True
-    assert manifest["version"] == "1.1.0"
+    assert manifest["version"] == "1.2.0"
     assert manifest["iot_class"] == "cloud_polling"
     assert manifest["integration_type"] == "hub"
     assert manifest["single_config_entry"] is True
@@ -134,6 +134,8 @@ def test_station_activity_event_has_translations_and_icon() -> None:
     event_states = event["state_attributes"]["event_type"]["state"]
     assert event_states["movement_started"] == "Movement started"
     assert event_states["position_lost"] == "Position lost"
+    assert event_states["entered_zone"] == "Entered zone"
+    assert event_states["left_zone"] == "Left zone"
     assert icons["entity"]["event"]["station_activity"]["default"] == (
         "mdi:radio-tower"
     )

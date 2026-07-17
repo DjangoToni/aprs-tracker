@@ -1,4 +1,4 @@
-# APRS Monitor 1.1.0
+# APRS Monitor 1.2.0
 
 APRS Monitor is a tested Home Assistant custom integration for tracking multiple
 amateur-radio stations through the aprs.fi API.
@@ -25,11 +25,12 @@ Published releases use the fixed HACS asset name `aprs_monitor.zip`.
 
 ## Optional dashboards and automation blueprints
 
-Release 1.1.0 provides a separate `aprs_monitor-1.1.0-extras.zip`. Extract it
+Release 1.2.0 provides a separate `aprs_monitor-1.2.0-extras.zip`. Extract it
 directly into Home Assistant's `/config` directory. It installs:
 
 - `/config/blueprints/automation/aprs_monitor/station_activity_actions.yaml`
 - `/config/blueprints/automation/aprs_monitor/api_connection_actions.yaml`
+- `/config/blueprints/automation/aprs_monitor/zone_activity_actions.yaml`
 - `/config/aprs_monitor_examples/dashboard.yaml`
 - `/config/aprs_monitor_examples/README.md`
 
@@ -106,7 +107,8 @@ Assistant's standard map card. It combines the station profile display name with
 available speed, eight-point course direction, and altitude, for example
 `HB9ABC · 46 km/h · SE · 408 m`. Missing values are omitted. Configure a map
 entity with `label_mode: attribute` and `attribute: map_label` to use it. The
-extras dashboard contains separate symbol, telemetry, and 24-hour history views.
+extras dashboard contains separate zone, symbol, telemetry, and 24-hour history
+views.
 
 ## Station activity events
 
@@ -114,11 +116,18 @@ Every callsign has a `Station activity` event entity. It can emit:
 
 - `movement_started` and `movement_stopped`
 - `entered_home_radius` and `left_home_radius`
+- `entered_zone` and `left_zone`
 - `position_current`, `position_stale`, and `position_lost`
 
 No event is emitted during integration startup or reload. A failed aprs.fi request
 also emits no station event, because an API outage must not be interpreted as a
 real movement or lost position.
+
+Zone events follow Home Assistant's active-zone rules: the smallest matching
+non-passive zone wins. A direct move between zones emits `left_zone` followed by
+`entered_zone`. Event attributes include the zone name and entity ID plus origin
+and destination context, but never coordinates. Stale and missing positions do
+not imply a zone departure.
 
 An automation can react to one event type by monitoring the event entity's
 `event_type` attribute:

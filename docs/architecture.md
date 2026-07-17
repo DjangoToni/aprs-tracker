@@ -58,6 +58,13 @@ the effective station display name with available speed, compact course directio
 and altitude. Formatting is local, creates no additional entity or API request,
 and omits unknown telemetry instead of inserting placeholder values.
 
+Version 1.2 extends the immutable station activity snapshot with Home Assistant's
+active zone. Zone selection delegates to the core zone integration, which ignores
+passive zones and prefers the smallest matching active zone. Only two consecutive
+current snapshots can emit a zone transition. Direct zone-to-zone movement emits
+the departure before the arrival and carries names and entity IDs without
+coordinates. This calculation is local and adds no aprs.fi request.
+
 The activity event entity stores a snapshot after each successful coordinator
 update and emits only meaningful transitions. Its first snapshot is established
 during entity construction, preventing false startup and reload events. Failed

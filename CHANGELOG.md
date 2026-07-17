@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0 - 2026-07-17
+
+- Added `entered_zone` and `left_zone` station events using Home Assistant's
+  active-zone selection rules.
+- Added zone name, entity ID, origin, and destination context without exposing
+  coordinates in event attributes.
+- Ignored passive zones and unknown zone state from stale or missing positions.
+- Added a zone-specific arrival/departure automation blueprint and extended the
+  generic station-activity blueprint with zone events.
+- Added a dashboard zone view showing tracker states and configured zones.
+- Preserved all existing devices, unique IDs, history, and aprs.fi request count.
+
 ## 1.1.0 - 2026-07-16
 
 - Added detailed English and German installation guides for HACS, manual setup,
