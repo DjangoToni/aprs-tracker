@@ -1,5 +1,9 @@
 """APRS Monitor integration setup."""
 
+from pathlib import Path
+from secrets import token_urlsafe
+
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryError
@@ -16,22 +20,43 @@ from .const import (
     CONF_API_KEY,
     CONF_CALLSIGNS,
     CONF_HOME_RADIUS,
+    CONF_MAP_MARKER_STYLE,
     CONF_MAX_POSITION_AGE,
     CONF_MOVEMENT_SPEED_THRESHOLD,
     CONF_STATION_PROFILES,
     CONF_UPDATE_INTERVAL,
     DOMAIN,
     PLATFORMS,
+    SYMBOL_TOKEN_DATA,
 )
 from .coordinator import AprsMonitorCoordinator
 from .device_cleanup import should_remove_aprs_device
 from .migration import normalized_runtime_options
+from .symbol_view import AprsSymbolRenderer, AprsSymbolView
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+_SYMBOL_ASSET_PATH = Path(__file__).parent / "aprs_symbol_assets"
+_FRONTEND_PATH = Path(__file__).parent / "frontend"
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the APRS Monitor component."""
+    await hass.http.async_register_static_paths(
+        [
+            StaticPathConfig(
+                "/api/aprs_monitor/frontend",
+                str(_FRONTEND_PATH),
+                True,
+            )
+        ]
+    )
+    access_token = token_urlsafe(24)
+    hass.data[SYMBOL_TOKEN_DATA] = access_token
+    renderer = await hass.async_add_executor_job(
+        AprsSymbolRenderer,
+        _SYMBOL_ASSET_PATH,
+    )
+    hass.http.register_view(AprsSymbolView(hass, renderer, access_token))
     return True
 
 
@@ -45,6 +70,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     max_position_age = options[CONF_MAX_POSITION_AGE]
     home_radius = options[CONF_HOME_RADIUS]
     movement_speed_threshold = options[CONF_MOVEMENT_SPEED_THRESHOLD]
+    map_marker_style = options[CONF_MAP_MARKER_STYLE]
     coordinator = AprsMonitorCoordinator(
         hass,
         entry,
@@ -55,6 +81,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         int(max_position_age),
         float(home_radius),
         float(movement_speed_threshold),
+        str(map_marker_style),
         options[CONF_STATION_PROFILES],
     )
     await coordinator.async_config_entry_first_refresh()

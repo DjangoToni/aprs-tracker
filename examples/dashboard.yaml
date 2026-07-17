@@ -60,21 +60,15 @@ views:
     path: aprs-symbols
     icon: mdi:map-marker-multiple
     cards:
-      - type: map
-        title: APRS-Symbole
+      - type: custom:aprs-monitor-map-card
+        title: APRS Live-Telemetrie
+        height: 500
         auto_fit: true
-        fit_zones: true
-        cluster: false
-        theme_mode: auto
+        scroll_wheel_zoom: true
         entities:
-          - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
-            label_mode: icon
-          - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
-            label_mode: icon
-          - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
-            label_mode: icon
-          - entity: zone.home
-            focus: false
+          - device_tracker.REPLACE_WITH_FIRST_TRACKER
+          - device_tracker.REPLACE_WITH_SECOND_TRACKER
+          - device_tracker.REPLACE_WITH_THIRD_TRACKER
 
   - title: Telemetrie
     path: aprs-telemetry
@@ -89,13 +83,13 @@ views:
         entities:
           - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
             label_mode: attribute
-            attribute: map_label
+            attribute: map_details
           - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
             label_mode: attribute
-            attribute: map_label
+            attribute: map_details
           - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
             label_mode: attribute
-            attribute: map_label
+            attribute: map_details
           - entity: zone.home
             focus: false
 

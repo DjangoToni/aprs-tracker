@@ -18,9 +18,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Create the central manual-refresh button."""
-    async_add_entities(
-        [AprsRefreshButton(hass.data[DOMAIN][entry.entry_id], entry.entry_id)]
-    )
+    async_add_entities([AprsRefreshButton(hass.data[DOMAIN][entry.entry_id], entry.entry_id)])
 
 
 class AprsRefreshButton(CoordinatorEntity, ButtonEntity):

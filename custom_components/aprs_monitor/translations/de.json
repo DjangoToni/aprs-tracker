@@ -41,6 +41,7 @@
         "data": {
           "callsigns": "Rufzeichen",
           "home_radius": "Nähe-Radius Zuhause (km)",
+          "map_marker_style": "Kartenmarkierungsstil",
           "max_position_age": "Position veraltet nach (Minuten)",
           "movement_speed_threshold": "Bewegungsschwelle (km/h)",
           "update_interval": "Aktualisierungsintervall (Minuten)"
@@ -60,6 +61,14 @@
       }
     }
   },
+  "selector": {
+    "map_marker_style": {
+      "options": {
+        "aprs": "Originale APRS-Symbolgrafik",
+        "mdi": "Home-Assistant-Stationssymbol"
+      }
+    }
+  },
   "system_health": {
     "info": {
       "can_reach_aprs_fi": "aprs.fi-API erreichbar",
@@ -69,6 +78,7 @@
       "last_successful_update": "Letzter erfolgreicher Abruf",
       "last_update_success": "Letzter Abruf erfolgreich",
       "loaded_entries": "Geladene Einträge",
+      "map_marker_style": "Kartenmarkierungsstil",
       "max_position_age_minutes": "Maximales Positionsalter (Minuten)",
       "movement_speed_threshold_kmh": "Bewegungsschwelle (km/h)",
       "update_interval_minutes": "Aktualisierungsintervall (Minuten)"

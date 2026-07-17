@@ -85,9 +85,7 @@ def activity_transitions(
         and current.near_home is not None
         and previous.near_home != current.near_home
     ):
-        events.append(
-            "entered_home_radius" if current.near_home else "left_home_radius"
-        )
+        events.append("entered_home_radius" if current.near_home else "left_home_radius")
 
     if (
         previous.status == "current"

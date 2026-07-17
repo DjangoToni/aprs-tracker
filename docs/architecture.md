@@ -58,12 +58,34 @@ the effective station display name with available speed, compact course directio
 and altitude. Formatting is local, creates no additional entity or API request,
 and omits unknown telemetry instead of inserting placeholder values.
 
+Version 1.3 adds a presentation-only `map_details` tracker attribute containing
+the callsign, available speed, cardinal and degree course, altitude, and current
+coordinates. It is formatted locally from the same position response and is used
+by the example dashboard's standard telemetry map.
+
+The optional APRS Monitor Map Card is served through Home Assistant's static-path
+API and registered manually as a Lovelace JavaScript module. It uses only existing
+tracker states, escapes all entity-derived tooltip content, and never receives an
+API key or performs an aprs.fi request. A pinned local Leaflet 1.9.4 distribution
+renders the OpenStreetMap tile layer, APRS markers, and localized hover tooltips;
+the integration does not depend on undocumented Home Assistant frontend elements
+or an external JavaScript CDN.
+
 Version 1.2 extends the immutable station activity snapshot with Home Assistant's
 active zone. Zone selection delegates to the core zone integration, which ignores
 passive zones and prefers the smallest matching active zone. Only two consecutive
 current snapshots can emit a zone transition. Direct zone-to-zone movement emits
 the departure before the arrival and carries names and entity IDs without
 coordinates. This calculation is local and adds no aprs.fi request.
+
+Version 1.3 optionally exposes a local `entity_picture` for each current tracker.
+The URL contains only hexadecimal encodings of two validated printable APRS
+symbol characters. A read-only Home Assistant view crops the matching transparent
+PNG from bundled primary and alternate aprs.fi sprite tables and composites the
+overlay table where required. Rendering runs in Home Assistant's executor and is
+cached; it never receives a callsign, coordinate, comment, or credential. The
+default MDI style remains unchanged for existing installations. Changing the
+presentation style reloads entities without changing their unique IDs.
 
 The activity event entity stores a snapshot after each successful coordinator
 update and emits only meaningful transitions. Its first snapshot is established

@@ -41,6 +41,7 @@
         "data": {
           "callsigns": "Callsigns",
           "home_radius": "Near-home radius (km)",
+          "map_marker_style": "Map marker style",
           "max_position_age": "Mark position stale after (minutes)",
           "movement_speed_threshold": "Movement threshold (km/h)",
           "update_interval": "Update interval (minutes)"
@@ -60,6 +61,14 @@
       }
     }
   },
+  "selector": {
+    "map_marker_style": {
+      "options": {
+        "aprs": "Original APRS symbol graphic",
+        "mdi": "Home Assistant station icon"
+      }
+    }
+  },
   "system_health": {
     "info": {
       "can_reach_aprs_fi": "Reach aprs.fi API",
@@ -69,6 +78,7 @@
       "last_successful_update": "Last successful update",
       "last_update_success": "Last update successful",
       "loaded_entries": "Loaded entries",
+      "map_marker_style": "Map marker style",
       "max_position_age_minutes": "Maximum position age (minutes)",
       "movement_speed_threshold_kmh": "Movement threshold (km/h)",
       "update_interval_minutes": "Update interval (minutes)"

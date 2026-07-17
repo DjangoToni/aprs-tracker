@@ -19,10 +19,6 @@ def _key_paths(value, prefix=()):
 
 def test_source_english_and_german_translation_trees_match() -> None:
     source = json.loads((COMPONENT / "strings.json").read_text(encoding="utf-8"))
-    english = json.loads(
-        (COMPONENT / "translations" / "en.json").read_text(encoding="utf-8")
-    )
-    german = json.loads(
-        (COMPONENT / "translations" / "de.json").read_text(encoding="utf-8")
-    )
+    english = json.loads((COMPONENT / "translations" / "en.json").read_text(encoding="utf-8"))
+    german = json.loads((COMPONENT / "translations" / "de.json").read_text(encoding="utf-8"))
     assert _key_paths(source) == _key_paths(english) == _key_paths(german)

@@ -23,17 +23,13 @@ def normalize_callsigns(value: object) -> tuple[str, ...]:
     """Normalize 1–20 exact callsigns or return an empty tuple on error."""
     if isinstance(value, str):
         raw_value = value
-    elif isinstance(value, (list, tuple)) and all(
-        isinstance(item, str) for item in value
-    ):
+    elif isinstance(value, (list, tuple)) and all(isinstance(item, str) for item in value):
         raw_value = ",".join(value)
     else:
         return ()
     callsigns = tuple(
         dict.fromkeys(
-            part.strip().upper()
-            for part in raw_value.replace("\n", ",").split(",")
-            if part.strip()
+            part.strip().upper() for part in raw_value.replace("\n", ",").split(",") if part.strip()
         )
     )
     if (

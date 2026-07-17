@@ -86,9 +86,7 @@ class AprsPositionCurrentBinarySensor(CoordinatorEntity, BinarySensorEntity):
         """Expose freshness details for dashboards and automations."""
         position = self._position
         attributes: dict[str, Any] = {
-            "stale_after_minutes": self.coordinator.profile(
-                self._callsign
-            ).max_position_age,
+            "stale_after_minutes": self.coordinator.profile(self._callsign).max_position_age,
         }
         if position is not None:
             attributes["position_age_minutes"] = position_age_minutes(position)
@@ -209,9 +207,7 @@ class AprsMovingBinarySensor(CoordinatorEntity, BinarySensorEntity):
         """Expose reported speed and the configured threshold."""
         attributes: dict[str, Any] = {
             "movement_speed_threshold_kmh": (
-                self.coordinator.profile(
-                    self._callsign
-                ).movement_speed_threshold_kmh
+                self.coordinator.profile(self._callsign).movement_speed_threshold_kmh
             ),
         }
         if (position := self._position) is not None and position.speed_kmh is not None:

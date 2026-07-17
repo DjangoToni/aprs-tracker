@@ -14,11 +14,13 @@ from custom_components.aprs_monitor.const import (
     CONF_CALLSIGNS,
     CONF_DISPLAY_NAME,
     CONF_HOME_RADIUS,
+    CONF_MAP_MARKER_STYLE,
     CONF_MAX_POSITION_AGE,
     CONF_MOVEMENT_SPEED_THRESHOLD,
     CONF_STATION_PROFILES,
     CONF_UPDATE_INTERVAL,
     DOMAIN,
+    MAP_MARKER_STYLE_APRS,
     NAME,
 )
 
@@ -155,6 +157,7 @@ async def test_options_flow_stores_normalized_values(
         {
             CONF_CALLSIGNS: f"{CALLSIGN.lower()}, hb9new",
             CONF_HOME_RADIUS: 50.5,
+            CONF_MAP_MARKER_STYLE: MAP_MARKER_STYLE_APRS,
             CONF_UPDATE_INTERVAL: 10,
             CONF_MAX_POSITION_AGE: 90,
             CONF_MOVEMENT_SPEED_THRESHOLD: 2.5,
@@ -178,14 +181,13 @@ async def test_options_flow_stores_normalized_values(
             CONF_MOVEMENT_SPEED_THRESHOLD: 2.5,
         },
     }
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], profiles_input
-    )
+    result = await hass.config_entries.options.async_configure(result["flow_id"], profiles_input)
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert config_entry.options == {
         CONF_CALLSIGNS: [CALLSIGN, "HB9NEW"],
         CONF_HOME_RADIUS: 50.5,
+        CONF_MAP_MARKER_STYLE: MAP_MARKER_STYLE_APRS,
         CONF_UPDATE_INTERVAL: 10,
         CONF_MAX_POSITION_AGE: 90,
         CONF_MOVEMENT_SPEED_THRESHOLD: 2.5,

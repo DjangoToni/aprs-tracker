@@ -1,4 +1,4 @@
-# APRS Monitor 1.2.0 für Home Assistant
+# APRS Monitor 1.3.0 für Home Assistant
 
 Installationsanleitungen: [Deutsch](installation.de.md) ·
 [English](installation.md)
@@ -37,18 +37,44 @@ Verbindungsereignisse und manuelle Aktualisierung.
 
 Der erste Konfigurationsschritt enthält Rufzeichen, Abrufintervall und globale
 Vorgaben. Im zweiten Schritt besitzt jedes Rufzeichen ein einklappbares Profil mit
-Anzeigename, maximalem Positionsalter, Heimradius und Bewegungsschwelle.
+Anzeigename, maximalem Positionsalter, Heimradius und Bewegungsschwelle. Der
+globale Kartenmarkierungsstil wechselt zwischen Home-Assistant-Stationssymbolen
+und originalen APRS-Symbolgrafiken.
 Anzeigenamen verändern keine Geräteidentitäten, Entity-IDs oder Verlaufsdaten.
 
 ## Karte und Automationen
 
 Bekannte APRS-Symbole werden in passende Home-Assistant-Kartensymbole übersetzt.
+Version 1.3 enthält zusätzlich die originalen APRS-Piktogramme aus dem offenen
+aprs.fi-Symbolsatz. Home Assistant schneidet das richtige Bild aus der primären
+oder alternativen Symboltabelle aus und ergänzt bei Bedarf ein Overlay. Die
+Grafiken werden ausschließlich lokal bereitgestellt und enthalten weder
+Rufzeichen noch Koordinaten. Die Auswahl befindet sich unter **APRS Monitor >
+Konfigurieren > Kartenmarkierungsstil**. Quellen und Lizenzhinweise sind im
+Integrationspaket enthalten.
 Jeder aktuelle Tracker besitzt zusätzlich das Attribut `map_label`. Es verbindet
 Anzeigename, Geschwindigkeit, achtteilige Kursrichtung und Höhe zu einer kompakten
-Kartenbeschriftung; fehlende APRS-Werte werden ausgelassen. Das optionale
+Kartenbeschriftung; fehlende APRS-Werte werden ausgelassen. `map_details` ergänzt
+Rufzeichen, Kurs in Grad und Koordinaten. Da die Home-Assistant-Standardkarte
+keine frei konfigurierbaren Hover-Tooltips bietet, enthält Version 1.3 zusätzlich
+die optionale `custom:aprs-monitor-map-card`. Sie zeigt das originale APRS-Symbol
+und beim Überfahren Geschwindigkeit, Richtung, Höhe, Koordinaten und Zeitpunkt
+des letzten Signals. Die Karte verwendet vorhandene Entitätszustände und erzeugt
+keine zusätzlichen aprs.fi-Abfragen. Das optionale
 Extras-Paket enthält drei Automations-Blueprints und ein Dashboard mit getrennten
 Zonen-, Symbol-, Telemetrie- und 24-Stunden-Verlaufsansichten. Das Extras-Paket wird direkt
 nach `/config` entpackt.
+
+Die Kartenressource wird einmalig unter **Einstellungen > Dashboards > Ressourcen**
+als JavaScript-Modul eingetragen:
+
+```text
+/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0
+```
+
+Leaflet 1.9.4 wird mit der Integration lokal unter der BSD-2-Clause-Lizenz
+ausgeliefert; es wird kein externes JavaScript-CDN verwendet. Die standardmäßig
+verwendeten OpenStreetMap-Kacheln benötigen weiterhin Netzwerkzugriff.
 
 Version 1.2 erkennt zusätzlich aktive Home-Assistant-Zonen. Die Stationsaktivität
 meldet `entered_zone` und `left_zone` mit Zonenname und Entity-ID, jedoch ohne

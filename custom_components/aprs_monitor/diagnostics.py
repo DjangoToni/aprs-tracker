@@ -41,9 +41,7 @@ async def async_get_config_entry_diagnostics(
         "loaded": True,
         "last_update_success": coordinator.last_update_success,
         "update_interval_minutes": (
-            int(update_interval.total_seconds() // 60)
-            if update_interval is not None
-            else None
+            int(update_interval.total_seconds() // 60) if update_interval is not None else None
         ),
         "max_position_age_minutes": coordinator.max_position_age,
         "home_radius_km": coordinator.home_radius_km,

@@ -11,8 +11,12 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import Position, is_position_stale, position_age_minutes
-from .aprs_symbols import aprs_symbol_character, aprs_symbol_icon
-from .const import DOMAIN
+from .aprs_symbols import (
+    aprs_symbol_character,
+    aprs_symbol_icon,
+    aprs_symbol_picture_url,
+)
+from .const import DOMAIN, MAP_MARKER_STYLE_APRS, SYMBOL_TOKEN_DATA
 from .geo import course_to_cardinal_abbreviation
 from .hub import station_device_info
 
@@ -70,6 +74,13 @@ class AprsMonitorTracker(CoordinatorEntity, TrackerEntity):
         return aprs_symbol_icon(self._position.symbol if self._position else None)
 
     @property
+    def entity_picture(self) -> str | None:
+        """Use the local APRS symbol graphic selected in integration options."""
+        if self.coordinator.map_marker_style != MAP_MARKER_STYLE_APRS:
+            return None
+        return self._symbol_picture
+
+    @property
     def extra_state_attributes(self) -> dict[str, Any]:
         position = self._position
         if position is None:
@@ -83,6 +94,7 @@ class AprsMonitorTracker(CoordinatorEntity, TrackerEntity):
             "symbol": position.symbol,
             "aprs_symbol_character": aprs_symbol_character(position.symbol),
             "aprs_symbol_icon": aprs_symbol_icon(position.symbol),
+            "aprs_symbol_picture": self._symbol_picture,
             "comment": position.comment,
             "last_seen": position.last_seen.isoformat(),
             "position_age_minutes": position_age_minutes(position),
@@ -91,9 +103,8 @@ class AprsMonitorTracker(CoordinatorEntity, TrackerEntity):
                 self.coordinator.profile(self._callsign).max_position_age,
             ),
             "map_label": self._map_label(position),
-            "stale_after_minutes": self.coordinator.profile(
-                self._callsign
-            ).max_position_age,
+            "map_details": self._map_details(position),
+            "stale_after_minutes": self.coordinator.profile(self._callsign).max_position_age,
         }
 
     def _map_label(self, position: Position) -> str:
@@ -106,6 +117,37 @@ class AprsMonitorTracker(CoordinatorEntity, TrackerEntity):
         if position.altitude_m is not None:
             parts.append(f"{position.altitude_m:.0f} m")
         return " · ".join(parts)
+
+    def _map_details(self, position: Position) -> str:
+        """Return detailed telemetry for Home Assistant's standard map card."""
+        display_name = self.coordinator.profile(self._callsign).display_name
+        station_name = (
+            position.callsign
+            if display_name == position.callsign
+            else f"{display_name} ({position.callsign})"
+        )
+        parts = [station_name]
+        if position.speed_kmh is not None:
+            parts.append(f"{position.speed_kmh:.0f} km/h")
+        direction = course_to_cardinal_abbreviation(position.course)
+        if direction and position.course is not None:
+            parts.append(f"{direction} ({position.course:.0f}°)")
+        elif direction:
+            parts.append(direction)
+        elif position.course is not None:
+            parts.append(f"{position.course:.0f}°")
+        if position.altitude_m is not None:
+            parts.append(f"{position.altitude_m:.0f} m")
+        parts.append(f"{position.latitude:.5f}, {position.longitude:.5f}")
+        return " · ".join(parts)
+
+    @property
+    def _symbol_picture(self) -> str | None:
+        """Return the protected local APRS pictogram URL."""
+        return aprs_symbol_picture_url(
+            self._position.symbol if self._position else None,
+            self.coordinator.hass.data.get(SYMBOL_TOKEN_DATA),
+        )
 
     @property
     def _position(self) -> Position | None:

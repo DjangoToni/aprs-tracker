@@ -11,10 +11,12 @@ from .const import (
     API_URL,
     CONF_CALLSIGNS,
     CONF_HOME_RADIUS,
+    CONF_MAP_MARKER_STYLE,
     CONF_MAX_POSITION_AGE,
     CONF_MOVEMENT_SPEED_THRESHOLD,
     CONF_UPDATE_INTERVAL,
     DEFAULT_HOME_RADIUS,
+    DEFAULT_MAP_MARKER_STYLE,
     DEFAULT_MAX_POSITION_AGE,
     DEFAULT_MOVEMENT_SPEED_THRESHOLD,
     DEFAULT_UPDATE_INTERVAL,
@@ -38,8 +40,7 @@ async def system_health_info(hass: HomeAssistant) -> dict[str, Any]:
     coordinator = coordinators[0] if len(coordinators) == 1 else None
 
     configured_station_count = sum(
-        len(entry.options.get(CONF_CALLSIGNS, entry.data[CONF_CALLSIGNS]))
-        for entry in entries
+        len(entry.options.get(CONF_CALLSIGNS, entry.data[CONF_CALLSIGNS])) for entry in entries
     )
     update_interval = (
         int(coordinator.update_interval.total_seconds() // 60)
@@ -65,6 +66,11 @@ async def system_health_info(hass: HomeAssistant) -> dict[str, Any]:
             DEFAULT_MOVEMENT_SPEED_THRESHOLD,
         )
     )
+    map_marker_style = (
+        coordinator.map_marker_style
+        if coordinator is not None
+        else _entry_option(entries, CONF_MAP_MARKER_STYLE, DEFAULT_MAP_MARKER_STYLE)
+    )
 
     return {
         "can_reach_aprs_fi": system_health.async_check_can_reach_url(hass, API_URL),
@@ -75,6 +81,7 @@ async def system_health_info(hass: HomeAssistant) -> dict[str, Any]:
         "max_position_age_minutes": max_position_age,
         "home_radius_km": home_radius,
         "movement_speed_threshold_kmh": movement_speed_threshold,
+        "map_marker_style": map_marker_style,
         "last_update_success": (
             coordinator.last_update_success if coordinator is not None else None
         ),
@@ -87,8 +94,8 @@ async def system_health_info(hass: HomeAssistant) -> dict[str, Any]:
 def _entry_option(
     entries,
     key: str,
-    default: int | float,
-) -> int | float | None:
+    default: int | float | str,
+) -> int | float | str | None:
     """Return one non-sensitive option for the supported single config entry."""
     if len(entries) != 1:
         return None

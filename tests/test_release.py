@@ -7,17 +7,22 @@ from script.build_release import build_release, integration_version
 
 
 def test_project_versions_are_synchronized() -> None:
-    assert integration_version() == "1.2.0"
+    assert integration_version() == "1.3.0"
 
 
 def test_builds_hacs_and_manual_archives(tmp_path) -> None:
-    paths = build_release(tmp_path, "v1.2.0")
+    paths = build_release(tmp_path, "v1.3.0")
     hacs_archive, manual_archive, extras_archive, checksums = paths
 
     with ZipFile(hacs_archive) as archive:
         names = archive.namelist()
         assert "manifest.json" in names
         assert "brand/icon.png" in names
+        assert "aprs_symbol_assets/aprs-symbols-64-0.png" in names
+        assert "aprs_symbol_assets/COPYRIGHT.md" in names
+        assert "frontend/aprs-monitor-map-card.js" in names
+        assert "frontend/vendor/leaflet/leaflet.js" in names
+        assert "frontend/vendor/leaflet/LICENSE" in names
         assert not any("__pycache__" in name for name in names)
 
     with ZipFile(manual_archive) as archive:

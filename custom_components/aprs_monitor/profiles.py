@@ -53,9 +53,7 @@ def build_station_profiles(
                 normalize_home_radius(raw.get(CONF_HOME_RADIUS)) or default_home_radius
             ),
             movement_speed_threshold_kmh=(
-                normalize_movement_speed_threshold(
-                    raw.get(CONF_MOVEMENT_SPEED_THRESHOLD)
-                )
+                normalize_movement_speed_threshold(raw.get(CONF_MOVEMENT_SPEED_THRESHOLD))
                 or default_movement_speed_threshold
             ),
         )

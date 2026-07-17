@@ -20,10 +20,12 @@ from custom_components.aprs_monitor.api import AprsFiError, Position
 from custom_components.aprs_monitor.const import (
     CONF_DISPLAY_NAME,
     CONF_HOME_RADIUS,
+    CONF_MAP_MARKER_STYLE,
     CONF_MAX_POSITION_AGE,
     CONF_MOVEMENT_SPEED_THRESHOLD,
     CONF_STATION_PROFILES,
     DOMAIN,
+    MAP_MARKER_STYLE_APRS,
 )
 from custom_components.aprs_monitor.geo import (
     great_circle_distance_km,
@@ -91,21 +93,22 @@ async def test_setup_creates_tracker_and_station_entities(
     assert tracker.attributes["icon"] == "mdi:car"
     assert tracker.attributes["aprs_symbol_character"] == ">"
     assert tracker.attributes["aprs_symbol_icon"] == "mdi:car"
+    assert tracker.attributes["aprs_symbol_picture"].startswith(
+        "/api/aprs_monitor/symbol/2f-3e.png?token="
+    )
+    assert "entity_picture" not in tracker.attributes
     assert tracker.attributes["map_label"] == "HB9TST · 46 km/h · SE · 408 m"
+    assert tracker.attributes["map_details"] == (
+        "HB9TST · 46 km/h · SE (123°) · 408 m · 47.37690, 8.54170"
+    )
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_speed"].state == "45.6"
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_course"].state == "123.0"
-    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_course_direction"].state == (
-        "southeast"
-    )
+    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_course_direction"].state == ("southeast")
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_altitude"].state == "408.0"
     distance = round(great_circle_distance_km(47.0, 8.0, 47.3769, 8.5417), 2)
     bearing = round(initial_bearing_degrees(47.0, 8.0, 47.3769, 8.5417), 1)
-    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_distance_from_home"].state == str(
-        distance
-    )
-    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_bearing_from_home"].state == str(
-        bearing
-    )
+    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_distance_from_home"].state == str(distance)
+    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_bearing_from_home"].state == str(bearing)
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_position_current"].state == "on"
     near_home = states[f"{loaded_entry.entry_id}_{CALLSIGN}_near_home"]
     assert near_home.state == "off"
@@ -126,9 +129,7 @@ async def test_setup_creates_tracker_and_station_entities(
     overall = states[f"{loaded_entry.entry_id}_overall_status"]
     assert overall.state == "ok"
     assert overall.attributes["current_station_count"] == 1
-    assert states[f"{loaded_entry.entry_id}_last_successful_update"].state != (
-        STATE_UNAVAILABLE
-    )
+    assert states[f"{loaded_entry.entry_id}_last_successful_update"].state != (STATE_UNAVAILABLE)
     assert states[f"{loaded_entry.entry_id}_connection_activity"].state == "unknown"
     assert states[f"{loaded_entry.entry_id}_refresh"].state == "unknown"
 
@@ -157,12 +158,11 @@ async def test_update_failure_and_recovery(
     )
     assert states[f"{loaded_entry.entry_id}_api_connected"].state == "off"
     assert states[f"{loaded_entry.entry_id}_overall_status"].state == "error"
-    assert states[f"{loaded_entry.entry_id}_connection_activity"].attributes[
-        "event_type"
-    ] == "api_unavailable"
-    assert states[f"{loaded_entry.entry_id}_last_successful_update"].state != (
-        STATE_UNAVAILABLE
+    assert (
+        states[f"{loaded_entry.entry_id}_connection_activity"].attributes["event_type"]
+        == "api_unavailable"
     )
+    assert states[f"{loaded_entry.entry_id}_last_successful_update"].state != (STATE_UNAVAILABLE)
 
     with patch(
         "custom_components.aprs_monitor.coordinator.async_get_positions",
@@ -177,9 +177,10 @@ async def test_update_failure_and_recovery(
     assert activity.state == "unknown"
     assert activity.attributes["event_type"] is None
     assert states[f"{loaded_entry.entry_id}_api_connected"].state == "on"
-    assert states[f"{loaded_entry.entry_id}_connection_activity"].attributes[
-        "event_type"
-    ] == "api_recovered"
+    assert (
+        states[f"{loaded_entry.entry_id}_connection_activity"].attributes["event_type"]
+        == "api_recovered"
+    )
 
 
 async def test_three_callsigns_create_all_station_entities(
@@ -195,9 +196,7 @@ async def test_three_callsigns_create_all_station_entities(
         config_entry,
         data={**config_entry.data, "callsigns": list(callsigns)},
     )
-    positions = {
-        callsign: replace(position, callsign=callsign) for callsign in callsigns
-    }
+    positions = {callsign: replace(position, callsign=callsign) for callsign in callsigns}
     with patch(
         "custom_components.aprs_monitor.coordinator.async_get_positions",
         return_value=positions,
@@ -242,8 +241,9 @@ async def test_station_profile_applies_name_and_individual_thresholds(
 
     states = _states_by_unique_id(hass, config_entry.entry_id)
     tracker = states[f"{config_entry.entry_id}_{CALLSIGN}"]
-    assert tracker.attributes["map_label"] == (
-        "Einsatzfahrzeug · 46 km/h · SE · 408 m"
+    assert tracker.attributes["map_label"] == ("Einsatzfahrzeug · 46 km/h · SE · 408 m")
+    assert tracker.attributes["map_details"] == (
+        "Einsatzfahrzeug (HB9TST) · 46 km/h · SE (123°) · 408 m · 47.37690, 8.54170"
     )
     assert states[f"{config_entry.entry_id}_{CALLSIGN}_near_home"].state == "on"
     moving = states[f"{config_entry.entry_id}_{CALLSIGN}_moving"]
@@ -251,12 +251,35 @@ async def test_station_profile_applies_name_and_individual_thresholds(
     assert moving.attributes["movement_speed_threshold_kmh"] == 50.0
     device = next(
         item
-        for item in dr.async_entries_for_config_entry(
-            dr.async_get(hass), config_entry.entry_id
-        )
+        for item in dr.async_entries_for_config_entry(dr.async_get(hass), config_entry.entry_id)
         if (DOMAIN, CALLSIGN) in item.identifiers
     )
     assert device.name == "APRS Einsatzfahrzeug"
+
+
+async def test_aprs_map_marker_style_uses_local_entity_picture(
+    hass: HomeAssistant,
+    config_entry,
+    position: Position,
+) -> None:
+    """Switch map markers without changing the tracker entity identity."""
+    hass.config_entries.async_update_entry(
+        config_entry,
+        options={CONF_MAP_MARKER_STYLE: MAP_MARKER_STYLE_APRS},
+    )
+    with patch(
+        "custom_components.aprs_monitor.coordinator.async_get_positions",
+        return_value={CALLSIGN: position},
+    ):
+        assert await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+
+    states = _states_by_unique_id(hass, config_entry.entry_id)
+    tracker = states[f"{config_entry.entry_id}_{CALLSIGN}"]
+    assert tracker.attributes["entity_picture"].startswith(
+        "/api/aprs_monitor/symbol/2f-3e.png?token="
+    )
+    assert tracker.attributes["icon"] == "mdi:car"
 
 
 async def test_near_home_radius_transition(hass: HomeAssistant, loaded_entry) -> None:
@@ -429,9 +452,7 @@ async def test_stale_position_makes_proximity_unknown(
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_near_home"].state == STATE_UNAVAILABLE
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_position_current"].state == "off"
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_status"].state == "stale"
-    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_position_age"].state != (
-        STATE_UNAVAILABLE
-    )
+    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_position_age"].state != (STATE_UNAVAILABLE)
     activity = states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_activity"]
     assert activity.attributes["event_type"] == "position_stale"
 
@@ -456,6 +477,7 @@ async def test_missing_speed_makes_movement_unknown(
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_position_current"].state == "on"
     tracker = states[f"{loaded_entry.entry_id}_{CALLSIGN}"]
     assert tracker.attributes["map_label"] == "HB9TST · SE · 408 m"
+    assert tracker.attributes["map_details"] == ("HB9TST · SE (123°) · 408 m · 47.37690, 8.54170")
 
 
 async def test_missing_position_has_explicit_station_status(
@@ -472,9 +494,7 @@ async def test_missing_position_has_explicit_station_status(
         await hass.async_block_till_done()
 
     states = _states_by_unique_id(hass, loaded_entry.entry_id)
-    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_status"].state == (
-        "no_position"
-    )
+    assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_status"].state == ("no_position")
     assert states[f"{loaded_entry.entry_id}_{CALLSIGN}_position_current"].state == "off"
     activity = states[f"{loaded_entry.entry_id}_{CALLSIGN}_station_activity"]
     assert activity.attributes["event_type"] == "position_lost"
@@ -494,6 +514,4 @@ async def test_unload_removes_runtime_states(hass: HomeAssistant, loaded_entry) 
     await hass.async_block_till_done()
 
     assert loaded_entry.entry_id not in hass.data.get(DOMAIN, {})
-    assert all(
-        hass.states.get(entity_id).state == STATE_UNAVAILABLE for entity_id in entity_ids
-    )
+    assert all(hass.states.get(entity_id).state == STATE_UNAVAILABLE for entity_id in entity_ids)

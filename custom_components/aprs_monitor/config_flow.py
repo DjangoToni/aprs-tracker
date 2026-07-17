@@ -7,7 +7,13 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.selector import TextSelector, TextSelectorConfig, TextSelectorType
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    TextSelector,
+    TextSelectorConfig,
+    TextSelectorType,
+)
 
 from .api import AprsFiAuthenticationError, AprsFiError, async_validate_api
 from .const import (
@@ -15,15 +21,18 @@ from .const import (
     CONF_CALLSIGNS,
     CONF_DISPLAY_NAME,
     CONF_HOME_RADIUS,
+    CONF_MAP_MARKER_STYLE,
     CONF_MAX_POSITION_AGE,
     CONF_MOVEMENT_SPEED_THRESHOLD,
     CONF_STATION_PROFILES,
     CONF_UPDATE_INTERVAL,
     DEFAULT_HOME_RADIUS,
+    DEFAULT_MAP_MARKER_STYLE,
     DEFAULT_MAX_POSITION_AGE,
     DEFAULT_MOVEMENT_SPEED_THRESHOLD,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
+    MAP_MARKER_STYLES,
     MAX_HOME_RADIUS,
     MAX_MAX_POSITION_AGE,
     MAX_MOVEMENT_SPEED_THRESHOLD,
@@ -43,6 +52,12 @@ from .validation import (
 )
 
 _API_KEY_SELECTOR = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
+_MAP_MARKER_STYLE_SELECTOR = SelectSelector(
+    SelectSelectorConfig(
+        options=list(MAP_MARKER_STYLES),
+        translation_key="map_marker_style",
+    )
+)
 _OPTIONS_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_CALLSIGNS): str,
@@ -65,6 +80,7 @@ _OPTIONS_SCHEMA = vol.Schema(
                 max=MAX_MOVEMENT_SPEED_THRESHOLD,
             ),
         ),
+        vol.Required(CONF_MAP_MARKER_STYLE): _MAP_MARKER_STYLE_SELECTOR,
     }
 )
 
@@ -138,9 +154,7 @@ class AprsMonitorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             api_key = user_input[CONF_API_KEY].strip()
             entry = self._get_reauth_entry()
-            callsigns = tuple(
-                entry.options.get(CONF_CALLSIGNS, entry.data[CONF_CALLSIGNS])
-            )
+            callsigns = tuple(entry.options.get(CONF_CALLSIGNS, entry.data[CONF_CALLSIGNS]))
             if not api_key:
                 errors[CONF_API_KEY] = "api_key_required"
             else:
@@ -180,9 +194,7 @@ class AprsMonitorOptionsFlow(config_entries.OptionsFlowWithReload):
         if user_input is not None:
             callsigns = normalize_callsigns(user_input[CONF_CALLSIGNS])
             interval = normalize_update_interval(user_input[CONF_UPDATE_INTERVAL])
-            max_position_age = normalize_max_position_age(
-                user_input[CONF_MAX_POSITION_AGE]
-            )
+            max_position_age = normalize_max_position_age(user_input[CONF_MAX_POSITION_AGE])
             home_radius = normalize_home_radius(user_input[CONF_HOME_RADIUS])
             movement_speed_threshold = normalize_movement_speed_threshold(
                 user_input[CONF_MOVEMENT_SPEED_THRESHOLD]
@@ -204,6 +216,7 @@ class AprsMonitorOptionsFlow(config_entries.OptionsFlowWithReload):
                     CONF_MAX_POSITION_AGE: max_position_age,
                     CONF_HOME_RADIUS: home_radius,
                     CONF_MOVEMENT_SPEED_THRESHOLD: movement_speed_threshold,
+                    CONF_MAP_MARKER_STYLE: user_input[CONF_MAP_MARKER_STYLE],
                 }
                 return await self.async_step_profiles()
 
@@ -229,6 +242,10 @@ class AprsMonitorOptionsFlow(config_entries.OptionsFlowWithReload):
                 CONF_MOVEMENT_SPEED_THRESHOLD,
                 DEFAULT_MOVEMENT_SPEED_THRESHOLD,
             ),
+            CONF_MAP_MARKER_STYLE: self.config_entry.options.get(
+                CONF_MAP_MARKER_STYLE,
+                DEFAULT_MAP_MARKER_STYLE,
+            ),
         }
         return self.async_show_form(
             step_id="init",
@@ -251,13 +268,9 @@ class AprsMonitorOptionsFlow(config_entries.OptionsFlowWithReload):
                     CONF_DISPLAY_NAME: values[CONF_DISPLAY_NAME].strip(),
                     CONF_MAX_POSITION_AGE: int(values[CONF_MAX_POSITION_AGE]),
                     CONF_HOME_RADIUS: float(values[CONF_HOME_RADIUS]),
-                    CONF_MOVEMENT_SPEED_THRESHOLD: float(
-                        values[CONF_MOVEMENT_SPEED_THRESHOLD]
-                    ),
+                    CONF_MOVEMENT_SPEED_THRESHOLD: float(values[CONF_MOVEMENT_SPEED_THRESHOLD]),
                 }
-            return self.async_create_entry(
-                data={**pending, CONF_STATION_PROFILES: profiles}
-            )
+            return self.async_create_entry(data={**pending, CONF_STATION_PROFILES: profiles})
 
         existing_profiles = self.config_entry.options.get(CONF_STATION_PROFILES, {})
         schema: dict = {}
