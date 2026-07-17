@@ -112,7 +112,9 @@
           "event_type": {
             "state": {
               "entered_home_radius": "Entered home radius",
+              "entered_zone": "Entered zone",
               "left_home_radius": "Left home radius",
+              "left_zone": "Left zone",
               "movement_started": "Movement started",
               "movement_stopped": "Movement stopped",
               "position_current": "Position current",

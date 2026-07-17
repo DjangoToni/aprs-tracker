@@ -25,6 +25,37 @@ views:
           - binary_sensor.REPLACE_WITH_MOVING
           - binary_sensor.REPLACE_WITH_NEAR_HOME
 
+  - title: Zonen
+    path: aprs-zones
+    icon: mdi:map-marker-radius
+    cards:
+      - type: entities
+        title: Letzte Stationsereignisse
+        show_header_toggle: false
+        entities:
+          - event.REPLACE_WITH_FIRST_STATION_ACTIVITY
+          - event.REPLACE_WITH_SECOND_STATION_ACTIVITY
+          - event.REPLACE_WITH_THIRD_STATION_ACTIVITY
+      - type: map
+        title: APRS-Zonen
+        auto_fit: true
+        fit_zones: true
+        cluster: false
+        theme_mode: auto
+        entities:
+          - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
+            label_mode: state
+          - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
+            label_mode: state
+          - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
+            label_mode: state
+          - entity: zone.home
+            focus: false
+          - entity: zone.REPLACE_WITH_FIRST_ZONE
+            focus: false
+          - entity: zone.REPLACE_WITH_SECOND_ZONE
+            focus: false
+
   - title: Symbole
     path: aprs-symbols
     icon: mdi:map-marker-multiple

@@ -1,0 +1,66 @@
+blueprint:
+  name: APRS Monitor - Zonenankunft und -abfahrt
+  description: >-
+    Führt unterschiedliche Aktionen aus, wenn eine APRS-Station eine ausgewählte
+    aktive Home-Assistant-Zone betritt oder verlässt. Passive Zonen werden nach
+    den Home-Assistant-Regeln nicht als aktive Zone verwendet.
+  domain: automation
+  homeassistant:
+    min_version: 2026.7.0
+  input:
+    activity_entity:
+      name: Stationsaktivität
+      description: Ereignisentität des gewünschten APRS-Rufzeichens.
+      selector:
+        entity:
+          filter:
+            - domain: event
+              integration: aprs_monitor
+    zone_entity:
+      name: Überwachte Zone
+      description: Aktive Home-Assistant-Zone für Ankunft und Abfahrt.
+      selector:
+        entity:
+          filter:
+            - domain: zone
+    entered_actions:
+      name: Aktionen bei Ankunft
+      default: []
+      selector:
+        action: {}
+    left_actions:
+      name: Aktionen bei Abfahrt
+      default: []
+      selector:
+        action: {}
+
+variables:
+  selected_zone: !input zone_entity
+
+trigger:
+  - platform: state
+    entity_id: !input activity_entity
+    attribute: event_type
+    to: entered_zone
+    id: entered
+  - platform: state
+    entity_id: !input activity_entity
+    attribute: event_type
+    to: left_zone
+    id: left
+
+condition:
+  - condition: template
+    value_template: >-
+      {{ trigger.to_state is not none and
+         trigger.to_state.attributes.get('zone_entity_id') == selected_zone }}
+
+action:
+  - choose:
+      - conditions: "{{ trigger.id == 'entered' }}"
+        sequence: !input entered_actions
+      - conditions: "{{ trigger.id == 'left' }}"
+        sequence: !input left_actions
+
+mode: queued
+max: 10

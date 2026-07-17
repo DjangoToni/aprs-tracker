@@ -29,3 +29,6 @@ names never participate in a device or entity unique ID.
 
 Tracker attributes, including the version 1.1 `map_label`, are presentation data
 and do not change this unique-ID contract.
+
+Version 1.2 adds `entered_zone` and `left_zone` to the existing station activity
+event entity. No entity or device unique ID changes, and no migration is required.

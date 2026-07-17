@@ -7,11 +7,11 @@ from script.build_release import build_release, integration_version
 
 
 def test_project_versions_are_synchronized() -> None:
-    assert integration_version() == "1.1.0"
+    assert integration_version() == "1.2.0"
 
 
 def test_builds_hacs_and_manual_archives(tmp_path) -> None:
-    paths = build_release(tmp_path, "v1.1.0")
+    paths = build_release(tmp_path, "v1.2.0")
     hacs_archive, manual_archive, extras_archive, checksums = paths
 
     with ZipFile(hacs_archive) as archive:
@@ -32,6 +32,7 @@ def test_builds_hacs_and_manual_archives(tmp_path) -> None:
         names = archive.namelist()
         assert "blueprints/automation/aprs_monitor/station_activity_actions.yaml" in names
         assert "blueprints/automation/aprs_monitor/api_connection_actions.yaml" in names
+        assert "blueprints/automation/aprs_monitor/zone_activity_actions.yaml" in names
         assert "aprs_monitor_examples/dashboard.yaml" in names
         assert "aprs_monitor_examples/README.md" in names
 

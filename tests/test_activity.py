@@ -61,3 +61,33 @@ def test_reports_stale_and_lost_positions() -> None:
     missing = StationActivitySnapshot("no_position", None, None)
     assert activity_transitions(current, stale) == ["position_stale"]
     assert activity_transitions(stale, missing) == ["position_lost"]
+
+
+def test_reports_ordered_active_zone_transitions() -> None:
+    previous = StationActivitySnapshot(
+        "current",
+        True,
+        False,
+        "zone.work",
+        "Work",
+    )
+    current = StationActivitySnapshot(
+        "current",
+        True,
+        False,
+        "zone.club",
+        "Radio club",
+    )
+    assert activity_transitions(previous, current) == ["left_zone", "entered_zone"]
+
+
+def test_does_not_infer_zone_transition_from_unknown_position() -> None:
+    stale = StationActivitySnapshot("stale", None, None)
+    current = StationActivitySnapshot(
+        "current",
+        True,
+        False,
+        "zone.work",
+        "Work",
+    )
+    assert activity_transitions(stale, current) == ["position_current"]

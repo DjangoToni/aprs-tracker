@@ -15,6 +15,8 @@ EVENT_TYPES = [
     "movement_stopped",
     "entered_home_radius",
     "left_home_radius",
+    "entered_zone",
+    "left_zone",
 ]
 
 
@@ -25,6 +27,8 @@ class StationActivitySnapshot:
     status: str
     moving: bool | None
     near_home: bool | None
+    zone_entity_id: str | None = None
+    zone_name: str | None = None
 
 
 def build_activity_snapshot(
@@ -84,4 +88,14 @@ def activity_transitions(
         events.append(
             "entered_home_radius" if current.near_home else "left_home_radius"
         )
+
+    if (
+        previous.status == "current"
+        and current.status == "current"
+        and previous.zone_entity_id != current.zone_entity_id
+    ):
+        if previous.zone_entity_id is not None:
+            events.append("left_zone")
+        if current.zone_entity_id is not None:
+            events.append("entered_zone")
     return events

@@ -112,7 +112,9 @@
           "event_type": {
             "state": {
               "entered_home_radius": "Zuhause-Radius betreten",
+              "entered_zone": "Zone betreten",
               "left_home_radius": "Zuhause-Radius verlassen",
+              "left_zone": "Zone verlassen",
               "movement_started": "Bewegung begonnen",
               "movement_stopped": "Bewegung beendet",
               "position_current": "Position aktuell",

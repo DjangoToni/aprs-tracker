@@ -1,4 +1,4 @@
-# APRS Monitor 1.1.0 für Home Assistant
+# APRS Monitor 1.2.0 für Home Assistant
 
 Installationsanleitungen: [Deutsch](installation.de.md) ·
 [English](installation.md)
@@ -46,9 +46,15 @@ Bekannte APRS-Symbole werden in passende Home-Assistant-Kartensymbole übersetzt
 Jeder aktuelle Tracker besitzt zusätzlich das Attribut `map_label`. Es verbindet
 Anzeigename, Geschwindigkeit, achtteilige Kursrichtung und Höhe zu einer kompakten
 Kartenbeschriftung; fehlende APRS-Werte werden ausgelassen. Das optionale
-Extras-Paket enthält zwei Automations-Blueprints und ein Dashboard mit getrennten
-Symbol-, Telemetrie- und 24-Stunden-Verlaufsansichten. Das Extras-Paket wird direkt
+Extras-Paket enthält drei Automations-Blueprints und ein Dashboard mit getrennten
+Zonen-, Symbol-, Telemetrie- und 24-Stunden-Verlaufsansichten. Das Extras-Paket wird direkt
 nach `/config` entpackt.
+
+Version 1.2 erkennt zusätzlich aktive Home-Assistant-Zonen. Die Stationsaktivität
+meldet `entered_zone` und `left_zone` mit Zonenname und Entity-ID, jedoch ohne
+Koordinaten. Passive Zonen sowie fehlende oder veraltete Positionen lösen keine
+Zonenwechsel aus. Eine eigene Blueprint führt getrennte Aktionen bei Ankunft und
+Abfahrt in einer ausgewählten Zone aus.
 
 ## Zustände und Fehler
 

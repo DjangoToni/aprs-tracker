@@ -2,7 +2,7 @@
 
 DOMAIN = "aprs_monitor"
 NAME = "APRS Monitor"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 CONF_API_KEY = "api_key"
 CONF_CALLSIGNS = "callsigns"
