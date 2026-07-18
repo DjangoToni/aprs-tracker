@@ -71,6 +71,15 @@ renders the OpenStreetMap tile layer, APRS markers, and localized hover tooltips
 the integration does not depend on undocumented Home Assistant frontend elements
 or an external JavaScript CDN.
 
+Version 1.4 optionally requests device-tracker history from Home Assistant's
+permission-filtered `history/history_during_period` WebSocket command. It keeps
+live state rendering independent from Recorder availability, limits the requested
+time range to 168 hours, caps rendered points per station, removes consecutive
+duplicate positions, and downsamples longer tracks. History is refreshed on a
+bounded interval and never causes an aprs.fi request. Marker state is derived from
+the live tracker attributes; when live coordinates are unavailable, only the last
+Recorder coordinate is reused and the marker remains visibly unavailable.
+
 Version 1.2 extends the immutable station activity snapshot with Home Assistant's
 active zone. Zone selection delegates to the core zone integration, which ignores
 passive zones and prefers the smallest matching active zone. Only two consecutive

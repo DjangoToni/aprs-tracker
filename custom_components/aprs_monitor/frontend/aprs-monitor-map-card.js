@@ -1,6 +1,7 @@
 const FRONTEND_BASE = new URL(".", import.meta.url);
 const LEAFLET_SCRIPT = new URL("vendor/leaflet/leaflet.js", FRONTEND_BASE).href;
 const LEAFLET_STYLE = new URL("vendor/leaflet/leaflet.css", FRONTEND_BASE).href;
+const TRACK_COLORS = ["#039be5", "#e53935", "#43a047", "#fb8c00", "#8e24aa", "#00897b"];
 
 let leafletPromise;
 
@@ -38,18 +39,28 @@ function localeText(language) {
       altitude: "Höhe",
       coordinates: "Koordinaten",
       course: "Richtung",
+      current: "Aktuell",
       empty: "Keine aktuellen APRS-Positionen verfügbar",
+      historyUnavailable: "Recorder-Verlauf konnte nicht geladen werden",
       lastSeen: "Letztes Signal",
       speed: "Geschwindigkeit",
+      stale: "Veraltet",
+      status: "Status",
+      unavailable: "Nicht verfügbar",
     };
   }
   return {
     altitude: "Altitude",
     coordinates: "Coordinates",
     course: "Direction",
+    current: "Current",
     empty: "No current APRS positions available",
+    historyUnavailable: "Recorder history could not be loaded",
     lastSeen: "Last signal",
     speed: "Speed",
+    stale: "Stale",
+    status: "Status",
+    unavailable: "Unavailable",
   };
 }
 
@@ -62,11 +73,53 @@ function cardinal(course, language) {
   return points[Math.round((((course % 360) + 360) % 360) / 45) % 8];
 }
 
+function validCoordinate(latitude, longitude) {
+  return (
+    latitude !== null &&
+    longitude !== null &&
+    latitude >= -90 &&
+    latitude <= 90 &&
+    longitude >= -180 &&
+    longitude <= 180
+  );
+}
+
+function markerStatus(state, usesHistoryFallback = false) {
+  if (usesHistoryFallback || state?.state === "unknown" || state?.state === "unavailable") {
+    return "unavailable";
+  }
+  if (state?.attributes?.position_stale === true) return "stale";
+  return "current";
+}
+
+function historyPoints(states, maximum) {
+  const points = [];
+  for (const item of states ?? []) {
+    const attrs = item.attributes ?? item.a ?? {};
+    const latitude = numeric(attrs.latitude);
+    const longitude = numeric(attrs.longitude);
+    if (!validCoordinate(latitude, longitude)) continue;
+    const previous = points.at(-1);
+    if (previous?.[0] === latitude && previous?.[1] === longitude) continue;
+    points.push([latitude, longitude]);
+  }
+  if (points.length <= maximum) return points;
+  const step = (points.length - 1) / (maximum - 1);
+  return Array.from({ length: maximum }, (_, index) => points[Math.round(index * step)]);
+}
+
+export { historyPoints, markerStatus, validCoordinate };
+
 class AprsMonitorMapCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
     this._markers = new Map();
+    this._historyLayers = new Map();
+    this._historyPositions = new Map();
+    this._historyLoadedAt = 0;
+    this._historyLoading = false;
+    this._historyRequest = 0;
     this._fitted = false;
   }
 
@@ -77,19 +130,36 @@ class AprsMonitorMapCard extends HTMLElement {
     this._config = {
       auto_fit: true,
       height: 500,
+      history_refresh_minutes: 15,
+      hours_to_show: 0,
       max_zoom: 16,
+      max_history_points: 2000,
+      show_status: true,
+      track_opacity: 0.7,
+      track_weight: 4,
       ...config,
-      entities: config.entities.map((item) =>
-        typeof item === "string" ? item : item.entity,
-      ),
     };
-    if (this._config.entities.some((entityId) => !entityId)) {
+    this._entityConfigs = config.entities.map((item, index) => ({
+      color: TRACK_COLORS[index % TRACK_COLORS.length],
+      ...(typeof item === "string" ? { entity: item } : item),
+    }));
+    this._config.entities = this._entityConfigs.map((item) => item.entity);
+    if (this._entityConfigs.some((item) => !item.entity)) {
       throw new Error("Every APRS Monitor map entity needs an entity ID");
+    }
+    const historyHours = numeric(this._config.hours_to_show) ?? 0;
+    if (historyHours < 0 || historyHours > 168) {
+      throw new Error("hours_to_show must be between 0 and 168");
     }
     this._resizeObserver?.disconnect();
     this._map?.remove();
     this._map = undefined;
     this._markers.clear();
+    this._historyLayers.clear();
+    this._historyPositions.clear();
+    this._historyLoadedAt = 0;
+    this._historyLoading = false;
+    this._historyRequest += 1;
     this._fitted = false;
     this._renderShell();
     this._startMap();
@@ -99,6 +169,7 @@ class AprsMonitorMapCard extends HTMLElement {
     this._hass = hass;
     this._updateTitle();
     this._updateMarkers();
+    this._scheduleHistoryLoad();
   }
 
   connectedCallback() {
@@ -107,6 +178,7 @@ class AprsMonitorMapCard extends HTMLElement {
 
   disconnectedCallback() {
     this._resizeObserver?.disconnect();
+    this._historyRequest += 1;
   }
 
   getCardSize() {
@@ -150,7 +222,23 @@ class AprsMonitorMapCard extends HTMLElement {
           z-index: 800;
         }
         .aprs-monitor-marker { background: transparent; border: 0; }
-        .aprs-monitor-marker img {
+        .aprs-marker-frame {
+          align-items: center;
+          border-radius: 50%;
+          display: flex;
+          height: 48px;
+          justify-content: center;
+          position: relative;
+          transition: filter 160ms ease, box-shadow 160ms ease;
+          width: 48px;
+        }
+        .aprs-marker-frame.status-current { box-shadow: 0 0 0 3px #43a047; }
+        .aprs-marker-frame.status-stale { box-shadow: 0 0 0 4px #fb8c00; }
+        .aprs-marker-frame.status-unavailable {
+          box-shadow: 0 0 0 4px #757575;
+          filter: grayscale(1) opacity(0.72);
+        }
+        .aprs-marker-frame img {
           filter: drop-shadow(0 1px 2px rgb(0 0 0 / 65%));
           height: 48px;
           object-fit: contain;
@@ -170,6 +258,21 @@ class AprsMonitorMapCard extends HTMLElement {
           overflow: hidden;
           padding: 0 4px;
           width: 40px;
+        }
+        .notice {
+          background: color-mix(in srgb, var(--warning-color, #ff9800) 18%, var(--card-background-color));
+          border-radius: 8px;
+          bottom: 24px;
+          color: var(--primary-text-color);
+          display: none;
+          font-size: 12px;
+          left: 50%;
+          max-width: calc(100% - 48px);
+          padding: 7px 10px;
+          pointer-events: none;
+          position: absolute;
+          transform: translateX(-50%);
+          z-index: 800;
         }
         .leaflet-tooltip.aprs-monitor-tooltip {
           background: var(--card-background-color, white);
@@ -191,10 +294,12 @@ class AprsMonitorMapCard extends HTMLElement {
         <div style="position:relative">
           <div id="map" role="application" aria-label="APRS Monitor map"></div>
           <div class="empty"></div>
+          <div class="notice"></div>
         </div>
       </ha-card>`;
     this._mapElement = this.shadowRoot.querySelector("#map");
     this._emptyElement = this.shadowRoot.querySelector(".empty");
+    this._noticeElement = this.shadowRoot.querySelector(".notice");
     this._updateTitle();
   }
 
@@ -224,6 +329,7 @@ class AprsMonitorMapCard extends HTMLElement {
       this._resizeObserver = new ResizeObserver(() => this._map?.invalidateSize());
       this._resizeObserver.observe(this._mapElement);
       this._updateMarkers();
+      this._scheduleHistoryLoad();
       requestAnimationFrame(() => this._map?.invalidateSize());
     } catch (error) {
       this._emptyElement.textContent = error.message;
@@ -243,31 +349,32 @@ class AprsMonitorMapCard extends HTMLElement {
     if (!this._map || !this._hass || !this._config) return;
     const active = new Set();
     const bounds = [];
-    for (const entityId of this._config.entities) {
+    for (const entityConfig of this._entityConfigs) {
+      const entityId = entityConfig.entity;
       const state = this._hass.states[entityId];
-      const latitude = numeric(state?.attributes?.latitude);
-      const longitude = numeric(state?.attributes?.longitude);
-      if (
-        !state ||
-        state.state === "unavailable" ||
-        state.state === "unknown" ||
-        latitude === null ||
-        longitude === null
-      ) {
-        continue;
-      }
+      if (!state) continue;
+      const currentLatitude = numeric(state.attributes.latitude);
+      const currentLongitude = numeric(state.attributes.longitude);
+      const currentValid = validCoordinate(currentLatitude, currentLongitude);
+      const fallback = this._historyPositions.get(entityId);
+      const usesHistoryFallback = !currentValid && Boolean(fallback);
+      const latitude = currentValid ? currentLatitude : fallback?.[0] ?? null;
+      const longitude = currentValid ? currentLongitude : fallback?.[1] ?? null;
+      if (!validCoordinate(latitude, longitude)) continue;
+      const status = markerStatus(state, usesHistoryFallback);
       active.add(entityId);
       bounds.push([latitude, longitude]);
       const picture = state.attributes.entity_picture ?? state.attributes.aprs_symbol_picture;
       let marker = this._markers.get(entityId);
       if (!marker) {
         marker = this._L.marker([latitude, longitude], {
-          icon: this._markerIcon(state, picture),
+          icon: this._markerIcon(state, picture, status),
           keyboard: true,
           title: state.attributes.friendly_name ?? state.attributes.callsign ?? entityId,
         });
         marker._aprsPicture = picture;
-        marker.bindTooltip(this._tooltip(state), {
+        marker._aprsStatus = status;
+        marker.bindTooltip(this._tooltip(state, status, latitude, longitude), {
           className: "aprs-monitor-tooltip",
           direction: "top",
           offset: [0, -22],
@@ -278,10 +385,11 @@ class AprsMonitorMapCard extends HTMLElement {
         this._markers.set(entityId, marker);
       } else {
         marker.setLatLng([latitude, longitude]);
-        marker.setTooltipContent(this._tooltip(state));
-        if (marker._aprsPicture !== picture) {
-          marker.setIcon(this._markerIcon(state, picture));
+        marker.setTooltipContent(this._tooltip(state, status, latitude, longitude));
+        if (marker._aprsPicture !== picture || marker._aprsStatus !== status) {
+          marker.setIcon(this._markerIcon(state, picture, status));
           marker._aprsPicture = picture;
+          marker._aprsStatus = status;
         }
       }
     }
@@ -307,11 +415,118 @@ class AprsMonitorMapCard extends HTMLElement {
     }
   }
 
-  _markerIcon(state, picture) {
+  _scheduleHistoryLoad() {
+    const hours = numeric(this._config?.hours_to_show) ?? 0;
+    if (!this._map || !this._hass?.callWS || hours <= 0 || this._historyLoading) return;
+    const refreshMinutes = Math.max(
+      5,
+      Math.min(60, numeric(this._config.history_refresh_minutes) ?? 15),
+    );
+    if (Date.now() - this._historyLoadedAt < refreshMinutes * 60_000) return;
+    this._loadHistory();
+  }
+
+  async _loadHistory() {
+    const hours = numeric(this._config.hours_to_show) ?? 0;
+    const request = ++this._historyRequest;
+    const firstLoad = this._historyLoadedAt === 0;
+    this._historyLoading = true;
+    try {
+      const end = new Date();
+      const start = new Date(end.getTime() - hours * 60 * 60 * 1000);
+      const result = await this._hass.callWS({
+        type: "history/history_during_period",
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
+        entity_ids: this._config.entities,
+        include_start_time_state: true,
+        significant_changes_only: false,
+        minimal_response: false,
+        no_attributes: false,
+      });
+      if (request !== this._historyRequest || !this._map) return;
+      const maximum = Math.max(
+        100,
+        Math.min(5000, Math.round(numeric(this._config.max_history_points) ?? 2000)),
+      );
+      const allHistoryBounds = [];
+      this._historyPositions.clear();
+      for (const entityConfig of this._entityConfigs) {
+        const points = historyPoints(result?.[entityConfig.entity], maximum);
+        if (points.length) {
+          this._historyPositions.set(entityConfig.entity, points.at(-1));
+          allHistoryBounds.push(...points);
+        }
+        this._renderHistory(entityConfig, points);
+      }
+      this._historyLoadedAt = Date.now();
+      this._setNotice();
+      this._updateMarkers();
+      if (firstLoad && this._config.auto_fit && allHistoryBounds.length) {
+        const markerBounds = [...this._markers.values()].map((marker) => {
+          const point = marker.getLatLng();
+          return [point.lat, point.lng];
+        });
+        const bounds = [...allHistoryBounds, ...markerBounds];
+        if (bounds.length === 1) {
+          this._map.setView(bounds[0], numeric(this._config.zoom) ?? 13);
+        } else {
+          this._map.fitBounds(bounds, {
+            maxZoom: numeric(this._config.max_zoom) ?? 16,
+            padding: [40, 40],
+          });
+        }
+        this._fitted = true;
+      }
+    } catch (error) {
+      if (request === this._historyRequest) {
+        this._historyLoadedAt = Date.now();
+        this._setNotice(localeText(this._hass.language).historyUnavailable);
+        console.warn("APRS Monitor history request failed", error);
+      }
+    } finally {
+      if (request === this._historyRequest) this._historyLoading = false;
+    }
+  }
+
+  _renderHistory(entityConfig, points) {
+    const existing = this._historyLayers.get(entityConfig.entity);
+    if (points.length < 2) {
+      if (existing) {
+        existing.removeFrom(this._map);
+        this._historyLayers.delete(entityConfig.entity);
+      }
+      return;
+    }
+    const style = {
+      color: entityConfig.color,
+      interactive: false,
+      opacity: Math.max(0.1, Math.min(1, numeric(this._config.track_opacity) ?? 0.7)),
+      weight: Math.max(1, Math.min(12, numeric(this._config.track_weight) ?? 4)),
+    };
+    if (existing) {
+      existing.setLatLngs(points);
+      existing.setStyle(style);
+      return;
+    }
+    this._historyLayers.set(
+      entityConfig.entity,
+      this._L.polyline(points, style).addTo(this._map),
+    );
+  }
+
+  _setNotice(message = "") {
+    if (!this._noticeElement) return;
+    this._noticeElement.textContent = message;
+    this._noticeElement.style.display = message ? "block" : "none";
+  }
+
+  _markerIcon(state, picture, status) {
+    const statusClass = this._config.show_status === false ? "" : ` status-${status}`;
     if (picture) {
       return this._L.divIcon({
         className: "aprs-monitor-marker",
-        html: `<img src="${escapeHtml(picture)}" alt="">`,
+        html: `<div class="aprs-marker-frame${statusClass}"><img src="${escapeHtml(picture)}" alt=""></div>`,
         iconAnchor: [24, 24],
         iconSize: [48, 48],
       });
@@ -319,23 +534,23 @@ class AprsMonitorMapCard extends HTMLElement {
     const callsign = state.attributes.callsign ?? state.attributes.friendly_name ?? "APRS";
     return this._L.divIcon({
       className: "aprs-monitor-marker",
-      html: `<div class="aprs-monitor-fallback">${escapeHtml(callsign)}</div>`,
+      html: `<div class="aprs-marker-frame${statusClass}"><div class="aprs-monitor-fallback">${escapeHtml(callsign)}</div></div>`,
       iconAnchor: [24, 18],
       iconSize: [48, 36],
     });
   }
 
-  _tooltip(state) {
+  _tooltip(state, status, markerLatitude, markerLongitude) {
     const attrs = state.attributes;
     const labels = localeText(this._hass.language);
     const speed = numeric(attrs.speed_kmh);
     const course = numeric(attrs.course);
     const altitude = numeric(attrs.altitude_m);
-    const latitude = numeric(attrs.latitude);
-    const longitude = numeric(attrs.longitude);
+    const latitude = numeric(markerLatitude);
+    const longitude = numeric(markerLongitude);
     const name = attrs.friendly_name ?? attrs.callsign ?? state.entity_id;
     const callsign = attrs.callsign && attrs.callsign !== name ? ` (${attrs.callsign})` : "";
-    const rows = [];
+    const rows = [[labels.status, labels[status] ?? status]];
     if (speed !== null) rows.push([labels.speed, `${speed.toFixed(0)} km/h`]);
     if (course !== null) {
       rows.push([labels.course, `${cardinal(course, this._hass.language)} (${course.toFixed(0)}°)`]);

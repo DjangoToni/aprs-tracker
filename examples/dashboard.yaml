@@ -65,10 +65,19 @@ views:
         height: 500
         auto_fit: true
         scroll_wheel_zoom: true
+        hours_to_show: 24
+        history_refresh_minutes: 15
+        max_history_points: 2000
+        show_status: true
+        track_weight: 4
+        track_opacity: 0.7
         entities:
-          - device_tracker.REPLACE_WITH_FIRST_TRACKER
-          - device_tracker.REPLACE_WITH_SECOND_TRACKER
-          - device_tracker.REPLACE_WITH_THIRD_TRACKER
+          - entity: device_tracker.REPLACE_WITH_FIRST_TRACKER
+            color: "#039be5"
+          - entity: device_tracker.REPLACE_WITH_SECOND_TRACKER
+            color: "#e53935"
+          - entity: device_tracker.REPLACE_WITH_THIRD_TRACKER
+            color: "#43a047"
 
   - title: Telemetrie
     path: aprs-telemetry

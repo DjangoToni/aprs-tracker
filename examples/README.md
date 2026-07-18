@@ -19,7 +19,7 @@ Before using the symbol view, register this URL as a JavaScript module under
 **Settings > Dashboards > Resources** and refresh the browser:
 
 ```text
-/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0
+/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.4.0
 ```
 
 The symbol view uses `custom:aprs-monitor-map-card` to render the original APRS
@@ -28,6 +28,10 @@ time on hover. Clicking the symbol opens Home Assistant's normal entity details.
 The included example enables `scroll_wheel_zoom: true`, so the map zooms around
 the mouse pointer; remove that line if dashboard page scrolling should take
 priority.
+The same card draws a 24-hour Recorder trail for each configured tracker. Green,
+orange, and grey marker rings represent current, stale, and unavailable stations.
+Each entity can define its own trail `color`; set `hours_to_show: 0` to disable
+history. Recorder access adds no aprs.fi request.
 The separate telemetry view uses the tracker's `map_details` attribute as a text
 marker for installations that prefer the standard Home Assistant map card.
 Missing APRS telemetry values are omitted automatically.

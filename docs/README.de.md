@@ -1,4 +1,4 @@
-# APRS Monitor 1.3.0 für Home Assistant
+# APRS Monitor 1.4.0 für Home Assistant
 
 Installationsanleitungen: [Deutsch](installation.de.md) ·
 [English](installation.md)
@@ -60,7 +60,11 @@ keine frei konfigurierbaren Hover-Tooltips bietet, enthält Version 1.3 zusätzl
 die optionale `custom:aprs-monitor-map-card`. Sie zeigt das originale APRS-Symbol
 und beim Überfahren Geschwindigkeit, Richtung, Höhe, Koordinaten und Zeitpunkt
 des letzten Signals. Die Karte verwendet vorhandene Entitätszustände und erzeugt
-keine zusätzlichen aprs.fi-Abfragen. Das optionale
+keine zusätzlichen aprs.fi-Abfragen. Version 1.4 zeichnet auf Wunsch für jedes
+Rufzeichen einen farbigen Verlauf aus dem Home-Assistant-Recorder. Ein grüner,
+oranger oder grauer Ring kennzeichnet aktuelle, veraltete beziehungsweise nicht
+verfügbare Stationen. Ist eine Station nicht verfügbar, bleibt sie an der letzten
+aufgezeichneten Position sichtbar. Das optionale
 Extras-Paket enthält drei Automations-Blueprints und ein Dashboard mit getrennten
 Zonen-, Symbol-, Telemetrie- und 24-Stunden-Verlaufsansichten. Das Extras-Paket wird direkt
 nach `/config` entpackt.
@@ -69,8 +73,14 @@ Die Kartenressource wird einmalig unter **Einstellungen > Dashboards > Ressource
 als JavaScript-Modul eingetragen:
 
 ```text
-/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0
+/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.4.0
 ```
+
+Mit `hours_to_show: 24` wird der 24-Stunden-Verlauf aktiviert; `0` schaltet ihn
+ab. `history_refresh_minutes`, `max_history_points`, `track_weight` und
+`track_opacity` begrenzen beziehungsweise gestalten die Anzeige. Unter `entities`
+kann für jedes Rufzeichen eine eigene Farbe angegeben werden. Die Verlaufsdaten
+stammen ausschließlich aus dem Recorder und erzeugen keine aprs.fi-Abfrage.
 
 Leaflet 1.9.4 wird mit der Integration lokal unter der BSD-2-Clause-Lizenz
 ausgeliefert; es wird kein externes JavaScript-CDN verwendet. Die standardmäßig
