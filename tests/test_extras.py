@@ -7,10 +7,14 @@ ROOT = Path(__file__).parents[1]
 
 def test_dashboard_uses_recorder_track_and_explicit_placeholders() -> None:
     dashboard = (ROOT / "examples" / "dashboard.yaml").read_text(encoding="utf-8")
-    assert "hours_to_show: 24" in dashboard
+    assert dashboard.count("hours_to_show: 24") == 2
     assert dashboard.count("- type: map") == 3
     assert "type: custom:aprs-monitor-map-card" in dashboard
     assert "scroll_wheel_zoom: true" in dashboard
+    assert "history_refresh_minutes: 15" in dashboard
+    assert "max_history_points: 2000" in dashboard
+    assert "show_status: true" in dashboard
+    assert 'color: "#039be5"' in dashboard
     assert "label_mode: icon" in dashboard
     assert "label_mode: state" in dashboard
     assert "attribute: map_details" in dashboard

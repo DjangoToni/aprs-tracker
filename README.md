@@ -1,4 +1,4 @@
-# APRS Monitor 1.3.0
+# APRS Monitor 1.4.0
 
 APRS Monitor is a tested Home Assistant custom integration for tracking multiple
 amateur-radio stations through the aprs.fi API.
@@ -25,7 +25,7 @@ Published releases use the fixed HACS asset name `aprs_monitor.zip`.
 
 ## Optional dashboards and automation blueprints
 
-Release 1.3.0 provides a separate `aprs_monitor-1.3.0-extras.zip`. Extract it
+Release 1.4.0 provides a separate `aprs_monitor-1.4.0-extras.zip`. Extract it
 directly into Home Assistant's `/config` directory. It installs:
 
 - `/config/blueprints/automation/aprs_monitor/station_activity_actions.yaml`
@@ -126,17 +126,23 @@ map card does not support custom multi-field hover tooltips.
 
 ### APRS Monitor Map Card
 
-Version 1.3 includes the optional `custom:aprs-monitor-map-card`. It preserves
+Version 1.4 includes the optional `custom:aprs-monitor-map-card`. It preserves
 the original APRS pictograms and shows callsign, speed, cardinal and degree
 course, altitude, coordinates, and last-seen time in a localized hover tooltip.
 The card reads the existing tracker states and creates no additional aprs.fi
 requests. Leaflet 1.9.4 is bundled locally under its BSD 2-Clause license; no
 external JavaScript CDN is used.
 
+The card can also draw a separate Recorder trail for every station and indicate
+whether its marker is current (green), stale (orange), or unavailable (grey).
+Unavailable stations remain visible at their last recorded position when history
+contains one. Trail history is opt-in and uses Home Assistant's existing Recorder
+database; it never queries aprs.fi directly.
+
 Register this JavaScript module once under **Settings > Dashboards > Resources**:
 
 ```text
-/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0
+/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.4.0
 ```
 
 Then use it in a manual card:
@@ -147,16 +153,26 @@ title: APRS Live
 height: 500
 auto_fit: true
 scroll_wheel_zoom: true
+hours_to_show: 24
+history_refresh_minutes: 15
+max_history_points: 2000
+show_status: true
 entities:
-  - device_tracker.first_callsign
-  - device_tracker.second_callsign
+  - entity: device_tracker.first_callsign
+    color: "#039be5"
+  - entity: device_tracker.second_callsign
+    color: "#e53935"
 ```
 
 Clicking a marker opens Home Assistant's normal entity details. Mouse-wheel zoom
 is enabled explicitly in this example and remains opt-in so ordinary dashboard
 scrolling is not captured unexpectedly. `tile_url`, `attribution`, `zoom`, and
-`max_zoom` are optional advanced settings. The default map tiles are provided by
-OpenStreetMap and require network access, just like other online tile maps.
+`max_zoom` are optional advanced settings. Set `hours_to_show` to `0` to disable
+trails or to `1` through `168` hours to enable them. The refresh interval accepts
+`5` through `60` minutes and the point limit accepts `100` through `5000` points
+per station. `track_weight` and `track_opacity` customize the lines, while each
+entity can have its own `color`. The default map tiles are provided by OpenStreetMap
+and require network access, just like other online tile maps.
 
 ## Station activity events
 

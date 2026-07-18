@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.0 - 2026-07-18
+
+- Added configurable station trails to the APRS Monitor Map Card using Home
+  Assistant Recorder history without additional aprs.fi requests.
+- Added distinct current, stale, and unavailable marker states, retaining the
+  last recorded position when the current tracker state has no coordinates.
+- Added per-station trail colors and configurable history duration, refresh
+  interval, point limit, line width, and opacity.
+- Added bounded history processing and non-fatal feedback when Recorder history
+  is unavailable, while keeping live markers and telemetry usable.
+- Updated the optional dashboard with a 24-hour multi-station trail view.
+
 ## 1.3.0 - 2026-07-18
 
 - Added the original aprs.fi APRS pictograms as optional Home Assistant map markers.

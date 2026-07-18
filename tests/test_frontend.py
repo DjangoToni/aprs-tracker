@@ -26,3 +26,27 @@ def test_map_card_has_local_assets_and_telemetry_tooltip() -> None:
     assert "coordinates" in source
     assert "last_seen" in source
     assert 'new CustomEvent("hass-more-info"' in source
+
+
+def test_map_card_reads_recorder_history_without_aprs_requests() -> None:
+    source = CARD.read_text(encoding="utf-8")
+    assert 'type: "history/history_during_period"' in source
+    assert "this._hass.callWS" in source
+    assert "significant_changes_only: false" in source
+    assert "minimal_response: false" in source
+    assert "no_attributes: false" in source
+    assert "hours_to_show: 0" in source
+    assert "max_history_points: 2000" in source
+    assert "history_refresh_minutes: 15" in source
+
+
+def test_map_card_visualizes_current_stale_and_unavailable_states() -> None:
+    source = CARD.read_text(encoding="utf-8")
+    assert 'return "current"' in source
+    assert 'return "stale"' in source
+    assert 'return "unavailable"' in source
+    assert "status-current" in source
+    assert "status-stale" in source
+    assert "status-unavailable" in source
+    assert "show_status: true" in source
+    assert "usesHistoryFallback" in source

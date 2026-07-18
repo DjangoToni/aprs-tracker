@@ -45,7 +45,7 @@ Home Assistant die Integration nicht finden.
 
 ## Optionale Dashboards und Blueprints
 
-1. Trage `/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.3.0` unter
+1. Trage `/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.4.0` unter
    **Einstellungen > Dashboards > Ressourcen** als JavaScript-Modul ein und
    aktualisiere danach die Browserseite. Damit wird die optionale Karte mit
    APRS-Grafiken und Telemetrie-Hovertext aktiviert.
