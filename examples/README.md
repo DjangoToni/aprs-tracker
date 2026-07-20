@@ -1,5 +1,9 @@
 # APRS Monitor dashboard and blueprints
 
+For detailed card options, complete YAML examples, import methods, and
+troubleshooting, see the [dashboard guide](../docs/dashboard.md) or the
+[German dashboard guide](../docs/dashboard.de.md).
+
 Extract the extras archive directly into the Home Assistant `/config` directory.
 The three blueprints then reside below `/config/blueprints/automation/aprs_monitor`.
 Reload automations or restart Home Assistant before creating an automation from a
