@@ -3,6 +3,9 @@
 Installationsanleitungen: [Deutsch](installation.de.md) ·
 [English](installation.md)
 
+Dashboard-Anleitungen: [Deutsch](dashboard.de.md) ·
+[English](dashboard.md)
+
 APRS Monitor verfolgt bis zu 20 APRS-Rufzeichen über die aprs.fi-API. Die
 Integration ist ausschließlich lesend und sendet weder APRS-Pakete noch
 Nachrichten.

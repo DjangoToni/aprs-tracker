@@ -8,6 +8,9 @@ German documentation is available in [docs/README.de.md](docs/README.de.md).
 Installation guides: [English](docs/installation.md) ·
 [Deutsch](docs/installation.de.md)
 
+Dashboard guides: [English](docs/dashboard.md) ·
+[Deutsch](docs/dashboard.de.md)
+
 ## Requirements
 
 - Home Assistant 2026.7.0 or newer
@@ -125,6 +128,10 @@ separate symbol view for the original APRS graphics. Home Assistant's standard
 map card does not support custom multi-field hover tooltips.
 
 ### APRS Monitor Map Card
+
+For complete installation, import, option, YAML, and troubleshooting instructions,
+see the dedicated [English dashboard guide](docs/dashboard.md) or
+[German dashboard guide](docs/dashboard.de.md).
 
 Version 1.4 includes the optional `custom:aprs-monitor-map-card`. It preserves
 the original APRS pictograms and shows callsign, speed, cardinal and degree

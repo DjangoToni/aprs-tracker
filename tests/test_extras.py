@@ -5,6 +5,22 @@ from pathlib import Path
 ROOT = Path(__file__).parents[1]
 
 
+def test_dashboard_guides_document_installation_and_all_card_options() -> None:
+    english = (ROOT / "docs" / "dashboard.md").read_text(encoding="utf-8")
+    german = (ROOT / "docs" / "dashboard.de.md").read_text(encoding="utf-8")
+    for guide in (english, german):
+        assert "/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.4.0" in guide
+        assert "type: custom:aprs-monitor-map-card" in guide
+        assert "hours_to_show: 24" in guide
+        assert "history_refresh_minutes: 15" in guide
+        assert "max_history_points: 2000" in guide
+        assert "track_weight: 4" in guide
+        assert "track_opacity: 0.7" in guide
+        assert "scroll_wheel_zoom: true" in guide
+        assert "examples/dashboard.yaml" in guide
+        assert "REPLACE_WITH_" in guide
+
+
 def test_dashboard_uses_recorder_track_and_explicit_placeholders() -> None:
     dashboard = (ROOT / "examples" / "dashboard.yaml").read_text(encoding="utf-8")
     assert dashboard.count("hours_to_show: 24") == 2

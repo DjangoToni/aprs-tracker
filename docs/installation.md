@@ -45,6 +45,9 @@ discover the integration in that structure.
 
 ## Optional dashboards and blueprints
 
+The complete card configuration, dashboard import, and troubleshooting guide is
+available in [Configuring the APRS Monitor dashboard](dashboard.md).
+
 1. Register `/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.4.0` as a
    JavaScript module under **Settings > Dashboards > Resources**, then refresh
    the browser. This enables the optional map with APRS graphics and telemetry

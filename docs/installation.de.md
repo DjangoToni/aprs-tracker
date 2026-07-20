@@ -45,6 +45,9 @@ Home Assistant die Integration nicht finden.
 
 ## Optionale Dashboards und Blueprints
 
+Die vollständige Kartenkonfiguration, der Dashboard-Import und die Fehlerbehebung
+stehen in [APRS-Monitor-Dashboard einrichten](dashboard.de.md).
+
 1. Trage `/api/aprs_monitor/frontend/aprs-monitor-map-card.js?v=1.4.0` unter
    **Einstellungen > Dashboards > Ressourcen** als JavaScript-Modul ein und
    aktualisiere danach die Browserseite. Damit wird die optionale Karte mit
